@@ -2,7 +2,6 @@ let playlist = [];
 let currentIndex = 0;
 let quranData = {}; 
 
-// بيانات المصحف الكامل (أسماء السور وعدد آياتها) مزروعة برمجياً لتخفيف ملف الـ JSON
 const surahNames = ["الفاتحة", "البقرة", "آل عمران", "النساء", "المائدة", "الأنعام", "الأعراف", "الأنفال", "التوبة", "يونس", "هود", "يوسف", "الرعد", "إبراهيم", "الحجر", "النحل", "الإسراء", "الكهف", "مريم", "طه", "الأنبياء", "الحج", "المؤمنون", "النور", "الفرقان", "الشعراء", "النمل", "القصص", "العنكبوت", "الروم", "لقمان", "السجدة", "الأحزاب", "سبأ", "فاطر", "يس", "الصافات", "ص", "الزمر", "غافر", "فصلت", "الشورى", "الزخرف", "الدخان", "الجاثية", "الأحقاف", "محمد", "الفتح", "الحجرات", "ق", "الذاريات", "الطور", "النجم", "القمر", "الرحمن", "الواقعة", "الحديد", "المجادلة", "الحشر", "الممتحنة", "الصف", "الجمعة", "المنافقون", "التغابن", "الطلاق", "التحريم", "الملك", "القلم", "الحاقة", "المعارج", "نوح", "الجن", "المزمل", "المدثر", "القيامة", "الإنسان", "المرسلات", "النبأ", "النازعات", "عبس", "التكوير", "الانفطار", "المطففين", "الانشقاق", "البروج", "الطارق", "الأعلى", "الغاشية", "الفجر", "البلد", "الشمس", "الليل", "الضحى", "الشرح", "التين", "العلق", "القدر", "البينة", "الزلزلة", "العاديات", "القارعة", "التكاثر", "العصر", "الهمزة", "الفيل", "قريش", "الماعون", "الكوثر", "الكافرون", "النصر", "المسد", "الإخلاص", "الفلق", "الناس"];
 const surahCounts = [7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 17, 19, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6];
 
@@ -22,7 +21,6 @@ let currentPlayerIndex = 0;
 let isPaused = false;
 let checkTimeInterval;
 
-// تحميل بيانات الشيوخ والمواضيع الخاصة
 fetch('data.json?v=' + new Date().getTime())
     .then(r => r.json())
     .then(data => {
@@ -30,11 +28,10 @@ fetch('data.json?v=' + new Date().getTime())
         data.reciters.forEach(r => {
             reciterSelect.add(new Option(r.name, r.folder));
         });
-        updateContentDropdown(); // تعبئة القائمة الثالثة عند بدء التشغيل
+        updateContentDropdown();
         statusDiv.innerText = "جاهز. اختر ما تريد الاستماع إليه.";
     });
 
-// دالة لتغيير محتوى القائمة الثالثة بناءً على اختيار المصحف
 function updateContentDropdown() {
     contentSelect.innerHTML = "";
     if (typeSelect.value === 'subjective') {
@@ -50,7 +47,6 @@ function updateContentDropdown() {
     }
 }
 
-// التجاوب مع تغيير نوع المصحف
 typeSelect.addEventListener('change', updateContentDropdown);
 
 function buildPlaylistAndPlay() {
@@ -58,21 +54,34 @@ function buildPlaylistAndPlay() {
     currentIndex = 0;
     ayahSelect.innerHTML = "";
     
+    let lastSurahId = -1;
+
     if (typeSelect.value === 'subjective') {
-        // منطق المصحف الموضوعي
         const selectedTopic = quranData.topics.find(t => t.id === contentSelect.value);
         selectedTopic.sections.forEach(section => {
+            // إضافة البسملة إذا كانت السورة قد تغيرت وليست سورة التوبة (رقم 9)
+            if (section.surah !== lastSurahId && section.surah !== 9) {
+                playlist.push({ isBasmala: true });
+                ayahSelect.add(new Option(`--- بسم الله الرحمن الرحيم ---`, playlist.length - 1));
+            }
+            lastSurahId = section.surah;
+
             for(let i = section.start; i <= section.end; i++) {
                 playlist.push({ surah: section.surah, ayah: i, name: section.name });
                 ayahSelect.add(new Option(`${section.name} - آية ${i}`, playlist.length - 1));
             }
         });
     } else {
-        // منطق المصحف الكامل
         const surahId = parseInt(contentSelect.value);
         const surahName = surahNames[surahId - 1];
         const totalAyahs = surahCounts[surahId - 1];
         
+        // إضافة البسملة في بداية السورة (إلا لو كانت التوبة)
+        if (surahId !== 9) {
+            playlist.push({ isBasmala: true });
+            ayahSelect.add(new Option(`--- بسم الله الرحمن الرحيم ---`, playlist.length - 1));
+        }
+
         for(let i = 1; i <= totalAyahs; i++) {
             playlist.push({ surah: surahId, ayah: i, name: `سورة ${surahName}` });
             ayahSelect.add(new Option(`سورة ${surahName} - آية ${i}`, playlist.length - 1));
@@ -85,14 +94,22 @@ function buildPlaylistAndPlay() {
 
 function getAudioUrl(index) {
     const item = playlist[index];
+    const reciterFolder = reciterSelect.value;
+    
+    if (item.isBasmala) {
+        // رابط البسملة الثابت (الآية 1 من السورة 1)
+        return `https://everyayah.com/data/${reciterFolder}/001001.mp3`;
+    }
+
     const s = String(item.surah).padStart(3, '0');
     const a = String(item.ayah).padStart(3, '0');
-    return `https://everyayah.com/data/${reciterSelect.value}/${s}${a}.mp3`;
+    return `https://everyayah.com/data/${reciterFolder}/${s}${a}.mp3`;
 }
 
 function playAyah(index) {
     if (index >= playlist.length) {
         statusDiv.innerText = "انتهت التلاوة.";
+        ayahImage.style.display = "none";
         return;
     }
     
@@ -110,12 +127,18 @@ function playAyah(index) {
     const nextPlayer = audioPlayers[nextPlayerIndex];
     
     const item = playlist[index];
-    statusDiv.innerText = `تلاوة: ${item.name} - آية ${item.ayah}`;
-    ayahImage.src = `https://everyayah.com/data/images_png/${item.surah}_${item.ayah}.png`;
+    
+    if (item.isBasmala) {
+        statusDiv.innerText = "تلاوة: بسم الله الرحمن الرحيم";
+        ayahImage.src = `https://everyayah.com/data/images_png/1_1.png`; // صورة البسملة
+    } else {
+        statusDiv.innerText = `تلاوة: ${item.name} - آية ${item.ayah}`;
+        ayahImage.src = `https://everyayah.com/data/images_png/${item.surah}_${item.ayah}.png`;
+    }
+    
     ayahImage.style.display = "block";
 
     activePlayer.src = getAudioUrl(index);
-    activePlayer.volume = 1;
     activePlayer.play().catch(e => console.log("تأخير في التحميل", e));
 
     if (index + 1 < playlist.length) {
