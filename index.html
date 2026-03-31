@@ -3,41 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المصحف الموضوعي</title>
+    <title>المصحف الموضوعي والشامل</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f9; }
         .container { max-width: 700px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         h1 { color: #2c3e50; margin-bottom: 30px; }
         .selectors { display: flex; flex-direction: column; gap: 15px; margin: 20px 0; text-align: right;}
-        select { padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #ddd; width: 100%; outline: none; }
-        button#playBtn { background-color: #27ae60; color: white; border: none; padding: 15px; font-size: 18px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.3s; }
+        select { padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #ddd; width: 100%; outline: none; background-color: #fff;}
+        button#playBtn { background-color: #27ae60; color: white; border: none; padding: 15px; font-size: 18px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.3s; margin-top: 10px;}
         button#playBtn:hover { background-color: #219150; transform: translateY(-2px); }
         
         .playback-controls { display: none; margin-top: 25px; background: #f8f9fa; padding: 20px; border-radius: 12px; border: 1px solid #eee; }
         .nav-buttons { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 15px;}
         .nav-btn { background-color: #3498db; color: white; border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-size: 14px; flex: 1; font-weight: bold;}
         .nav-btn:hover { filter: brightness(0.9); }
-        
-        /* زرار الإيقاف بياخد لون مختلف */
         #pauseBtn { background-color: #e67e22; }
 
         #status { margin-top: 15px; font-weight: 500; color: #7f8c8d; min-height: 24px; }
         #ayahImage { max-width: 100%; margin: 25px 0; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: none; transition: opacity 0.5s; }
-        
         audio { display: none; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>المصحف الموضوعي</h1>
+        <h1>المصحف الإلكتروني الشامل</h1>
         
         <div class="selectors">
             <label>اختر القارئ:</label>
             <select id="reciterSelect"></select>
 
-            <label>اختر الموضوع:</label>
-            <select id="topicSelect"></select>
+            <label>اختر نوع التلاوة:</label>
+            <select id="typeSelect">
+                <option value="subjective">المصحف الموضوعي (مواضيع مختارة)</option>
+                <option value="full">المصحف الكامل (سور القرآن)</option>
+            </select>
+
+            <label id="contentLabel">اختر الموضوع:</label>
+            <select id="contentSelect"></select>
         </div>
 
         <button id="playBtn">بدء الاستماع</button>
@@ -59,6 +62,6 @@
         <audio id="audioB"></audio>
     </div>
 
-    <script src="script.js?v=7"></script> 
+    <script src="script.js?v=8"></script> 
 </body>
 </html>
