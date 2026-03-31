@@ -2,8 +2,14 @@ let playlist = [];
 let currentIndex = 0;
 let quranData = {}; 
 
+// بيانات المصحف الكامل (أسماء السور وعدد آياتها) مزروعة برمجياً لتخفيف ملف الـ JSON
+const surahNames = ["الفاتحة", "البقرة", "آل عمران", "النساء", "المائدة", "الأنعام", "الأعراف", "الأنفال", "التوبة", "يونس", "هود", "يوسف", "الرعد", "إبراهيم", "الحجر", "النحل", "الإسراء", "الكهف", "مريم", "طه", "الأنبياء", "الحج", "المؤمنون", "النور", "الفرقان", "الشعراء", "النمل", "القصص", "العنكبوت", "الروم", "لقمان", "السجدة", "الأحزاب", "سبأ", "فاطر", "يس", "الصافات", "ص", "الزمر", "غافر", "فصلت", "الشورى", "الزخرف", "الدخان", "الجاثية", "الأحقاف", "محمد", "الفتح", "الحجرات", "ق", "الذاريات", "الطور", "النجم", "القمر", "الرحمن", "الواقعة", "الحديد", "المجادلة", "الحشر", "الممتحنة", "الصف", "الجمعة", "المنافقون", "التغابن", "الطلاق", "التحريم", "الملك", "القلم", "الحاقة", "المعارج", "نوح", "الجن", "المزمل", "المدثر", "القيامة", "الإنسان", "المرسلات", "النبأ", "النازعات", "عبس", "التكوير", "الانفطار", "المطففين", "الانشقاق", "البروج", "الطارق", "الأعلى", "الغاشية", "الفجر", "البلد", "الشمس", "الليل", "الضحى", "الشرح", "التين", "العلق", "القدر", "البينة", "الزلزلة", "العاديات", "القارعة", "التكاثر", "العصر", "الهمزة", "الفيل", "قريش", "الماعون", "الكوثر", "الكافرون", "النصر", "المسد", "الإخلاص", "الفلق", "الناس"];
+const surahCounts = [7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 17, 19, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6];
+
 const reciterSelect = document.getElementById('reciterSelect');
-const topicSelect = document.getElementById('topicSelect');
+const typeSelect = document.getElementById('typeSelect');
+const contentLabel = document.getElementById('contentLabel');
+const contentSelect = document.getElementById('contentSelect');
 const statusDiv = document.getElementById('status');
 const playBtn = document.getElementById('playBtn');
 const ayahImage = document.getElementById('ayahImage');
@@ -14,8 +20,9 @@ const pauseBtn = document.getElementById('pauseBtn');
 let audioPlayers = [document.getElementById('audioA'), document.getElementById('audioB')];
 let currentPlayerIndex = 0; 
 let isPaused = false;
-let checkTimeInterval; // لضمان عدم تداخل الأوامر الزمنية
+let checkTimeInterval;
 
+// تحميل بيانات الشيوخ والمواضيع الخاصة
 fetch('data.json?v=' + new Date().getTime())
     .then(r => r.json())
     .then(data => {
@@ -23,24 +30,54 @@ fetch('data.json?v=' + new Date().getTime())
         data.reciters.forEach(r => {
             reciterSelect.add(new Option(r.name, r.folder));
         });
-        data.topics.forEach(t => {
-            topicSelect.add(new Option(t.title, t.id));
-        });
-        statusDiv.innerText = "جاهز. اختر موضوعاً وابدأ.";
+        updateContentDropdown(); // تعبئة القائمة الثالثة عند بدء التشغيل
+        statusDiv.innerText = "جاهز. اختر ما تريد الاستماع إليه.";
     });
+
+// دالة لتغيير محتوى القائمة الثالثة بناءً على اختيار المصحف
+function updateContentDropdown() {
+    contentSelect.innerHTML = "";
+    if (typeSelect.value === 'subjective') {
+        contentLabel.innerText = "اختر الموضوع:";
+        quranData.topics.forEach(t => {
+            contentSelect.add(new Option(t.title, t.id));
+        });
+    } else {
+        contentLabel.innerText = "اختر السورة:";
+        surahNames.forEach((name, index) => {
+            contentSelect.add(new Option(`${index + 1}. سورة ${name}`, index + 1));
+        });
+    }
+}
+
+// التجاوب مع تغيير نوع المصحف
+typeSelect.addEventListener('change', updateContentDropdown);
 
 function buildPlaylistAndPlay() {
     playlist = [];
     currentIndex = 0;
     ayahSelect.innerHTML = "";
-    const selectedTopic = quranData.topics.find(t => t.id === topicSelect.value);
     
-    selectedTopic.sections.forEach(section => {
-        for(let i = section.start; i <= section.end; i++) {
-            playlist.push({ surah: section.surah, ayah: i, name: section.name });
-            ayahSelect.add(new Option(`${section.name} - ${i}`, playlist.length - 1));
+    if (typeSelect.value === 'subjective') {
+        // منطق المصحف الموضوعي
+        const selectedTopic = quranData.topics.find(t => t.id === contentSelect.value);
+        selectedTopic.sections.forEach(section => {
+            for(let i = section.start; i <= section.end; i++) {
+                playlist.push({ surah: section.surah, ayah: i, name: section.name });
+                ayahSelect.add(new Option(`${section.name} - آية ${i}`, playlist.length - 1));
+            }
+        });
+    } else {
+        // منطق المصحف الكامل
+        const surahId = parseInt(contentSelect.value);
+        const surahName = surahNames[surahId - 1];
+        const totalAyahs = surahCounts[surahId - 1];
+        
+        for(let i = 1; i <= totalAyahs; i++) {
+            playlist.push({ surah: surahId, ayah: i, name: `سورة ${surahName}` });
+            ayahSelect.add(new Option(`سورة ${surahName} - آية ${i}`, playlist.length - 1));
         }
-    });
+    }
     
     playbackControls.style.display = "block";
     playAyah(0);
@@ -55,7 +92,7 @@ function getAudioUrl(index) {
 
 function playAyah(index) {
     if (index >= playlist.length) {
-        statusDiv.innerText = "انتهى الموضوع.";
+        statusDiv.innerText = "انتهت التلاوة.";
         return;
     }
     
@@ -64,7 +101,6 @@ function playAyah(index) {
     currentIndex = index;
     ayahSelect.value = currentIndex;
     
-    // ضبط حالة الزرار عند بدء آية جديدة
     isPaused = false;
     pauseBtn.innerText = "إيقاف ⏸️";
     pauseBtn.style.backgroundColor = "#e67e22";
@@ -87,7 +123,6 @@ function playAyah(index) {
         nextPlayer.pause(); 
     }
 
-    // التداخل أصبح 0.3 ثانية، وزيادة سرعة الفحص لـ 50 ملي ثانية للدقة
     checkTimeInterval = setInterval(() => {
         if (!activePlayer.paused && !isNaN(activePlayer.duration)) {
             const remaining = activePlayer.duration - activePlayer.currentTime;
@@ -104,18 +139,17 @@ function startTransition() {
     playAyah(currentIndex + 1);
 }
 
-// برمجة زرار الإيقاف والتشغيل
 pauseBtn.onclick = () => {
     const activePlayer = audioPlayers[currentPlayerIndex];
     if (isPaused) {
         activePlayer.play();
         pauseBtn.innerText = "إيقاف ⏸️";
-        pauseBtn.style.backgroundColor = "#e67e22"; // برتقالي
+        pauseBtn.style.backgroundColor = "#e67e22"; 
         isPaused = false;
     } else {
         activePlayer.pause();
         pauseBtn.innerText = "تشغيل ▶️";
-        pauseBtn.style.backgroundColor = "#27ae60"; // أخضر
+        pauseBtn.style.backgroundColor = "#27ae60"; 
         isPaused = true;
     }
 };
