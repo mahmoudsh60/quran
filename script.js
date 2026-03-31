@@ -1,6 +1,6 @@
 let playlist = [];
 let currentIndex = 0;
-let quranData = {}; // هنحفظ فيها البيانات كلها
+let quranData = {}; 
 
 const reciterSelect = document.getElementById('reciterSelect');
 const topicSelect = document.getElementById('topicSelect');
@@ -9,13 +9,20 @@ const statusDiv = document.getElementById('status');
 const playBtn = document.getElementById('playBtn');
 const ayahImage = document.getElementById('ayahImage');
 
-// 1. قراءة البيانات وبناء القوائم المنسدلة
+// العناصر الجديدة
+const playbackControls = document.getElementById('playbackControls');
+const ayahSelect = document.getElementById('ayahSelect');
+const nextBtn = document.getElementById('nextBtn');
+const prevBtn = document.getElementById('prevBtn');
+
+// كائن صوتي مخفي وظيفته يحمل الآية اللي عليها الدور في الخلفية
+const preloader = new Audio(); 
+
 fetch('data.json')
     .then(response => response.json())
     .then(data => {
         quranData = data;
         
-        // تعبئة قائمة الشيوخ
         data.reciters.forEach(reciter => {
             let option = document.createElement('option');
             option.value = reciter.folder;
@@ -23,7 +30,6 @@ fetch('data.json')
             reciterSelect.appendChild(option);
         });
 
-        // تعبئة قائمة المواضيع
         data.topics.forEach(topic => {
             let option = document.createElement('option');
             option.value = topic.id;
@@ -33,62 +39,93 @@ fetch('data.json')
     })
     .catch(error => console.error("Error loading JSON:", error));
 
-// 2. دالة تجهيز قائمة التشغيل بناءً على اختيار المستخدم
 function buildPlaylistAndPlay() {
     playlist = [];
     currentIndex = 0;
+    ayahSelect.innerHTML = ""; // تفريغ قائمة الآيات القديمة
     
     const selectedTopicId = topicSelect.value;
     const selectedTopic = quranData.topics.find(t => t.id === selectedTopicId);
     
-    // تفريغ الآيات في الطابور
     selectedTopic.sections.forEach(section => {
         for(let i = section.start; i <= section.end; i++) {
-            playlist.push({ surah: section.surah, ayah: i, surahName: section.name });
+            let ayahObj = { surah: section.surah, ayah: i, surahName: section.name };
+            playlist.push(ayahObj);
+            
+            // إضافة الآية لقائمة التصفح السريع
+            let option = document.createElement('option');
+            option.value = playlist.length - 1; // الـ Index بتاعها
+            option.innerText = `${section.name} - آية ${i}`;
+            ayahSelect.appendChild(option);
         }
     });
     
+    playbackControls.style.display = "block"; // إظهار شريط التحكم
     playAyah(currentIndex);
 }
 
-// 3. دالة تشغيل الآية وعرض صورتها
+// دالة التحميل المسبق للآية التالية (عشان نلغي التقطيع)
+function preloadNextAyah(index) {
+    if (index + 1 < playlist.length) {
+        const nextAyah = playlist[index + 1];
+        const reciterFolder = reciterSelect.value;
+        const s = String(nextAyah.surah).padStart(3, '0');
+        const a = String(nextAyah.ayah).padStart(3, '0');
+        preloader.src = `https://everyayah.com/data/${reciterFolder}/${s}${a}.mp3`;
+        preloader.preload = "auto";
+    }
+}
+
 function playAyah(index) {
-    if (index >= playlist.length) {
-        statusDiv.innerText = "انتهت التلاوة لهذا الموضوع.";
+    if (index < 0 || index >= playlist.length) {
+        statusDiv.innerText = "انتهت التلاوة.";
         ayahImage.style.display = "none";
         return;
     }
 
-    const currentAyah = playlist[index];
+    currentIndex = index;
+    ayahSelect.value = currentIndex; // تحديث القائمة المنسدلة لتطابق الآية الحالية
+
+    const currentAyah = playlist[currentIndex];
     const reciterFolder = reciterSelect.value;
     
     statusDiv.innerText = `جاري تشغيل: ${currentAyah.surahName} - آية رقم ${currentAyah.ayah}`;
 
-    // تظبيط أرقام الصوت (تحتاج أصفار على اليسار)
     const surahAudioFormatted = String(currentAyah.surah).padStart(3, '0');
     const ayahAudioFormatted = String(currentAyah.ayah).padStart(3, '0');
     const audioUrl = `https://everyayah.com/data/${reciterFolder}/${surahAudioFormatted}${ayahAudioFormatted}.mp3`;
 
-    // رابط الصورة من EveryAyah (لا تحتاج أصفار)
     const imageUrl = `https://everyayah.com/data/images_png/${currentAyah.surah}_${currentAyah.ayah}.png`;
 
-    // تحديث المشغل والصورة
     audioPlayer.src = audioUrl;
     ayahImage.src = imageUrl;
-    ayahImage.style.display = "block"; // إظهار الصورة
+    ayahImage.style.display = "block"; 
     
     audioPlayer.play().catch(err => {
         console.error("مشكلة في تشغيل الآية:", err);
-        statusDiv.innerText = "جاري الانتقال للآية التالية...";
         setTimeout(playNext, 1500); 
     });
+
+    // استدعاء التحميل المسبق للآية اللي جاية في الخلفية
+    preloadNextAyah(currentIndex);
 }
 
+// دوال التنقل
 function playNext() {
-    currentIndex++;
-    playAyah(currentIndex);
+    if (currentIndex + 1 < playlist.length) playAyah(currentIndex + 1);
 }
 
-// 4. ربط الأزرار بالأحداث
+function playPrev() {
+    if (currentIndex - 1 >= 0) playAyah(currentIndex - 1);
+}
+
+// ربط الأحداث بالأزرار
 playBtn.addEventListener('click', buildPlaylistAndPlay);
+nextBtn.addEventListener('click', playNext);
+prevBtn.addEventListener('click', playPrev);
 audioPlayer.addEventListener('ended', playNext);
+
+// لما المستخدم يختار آية من القائمة المنسدلة
+ayahSelect.addEventListener('change', (e) => {
+    playAyah(parseInt(e.target.value));
+});
