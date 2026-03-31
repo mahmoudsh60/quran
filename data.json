@@ -5,18 +5,114 @@
   ],
   "topics": [
     {
-      "id": "musa",
+      "id": "prophet_musa",
       "title": "قصة سيدنا موسى عليه السلام",
       "sections": [
+        { "surah": 2, "start": 47, "end": 73, "name": "سورة البقرة" },
+        { "surah": 5, "start": 20, "end": 26, "name": "سورة المائدة" },
+        { "surah": 7, "start": 103, "end": 156, "name": "سورة الأعراف" },
+        { "surah": 10, "start": 75, "end": 92, "name": "سورة يونس" },
         { "surah": 20, "start": 9, "end": 98, "name": "سورة طه" },
-        { "surah": 28, "start": 3, "end": 46, "name": "سورة القصص" }
+        { "surah": 26, "start": 10, "end": 68, "name": "سورة الشعراء" },
+        { "surah": 27, "start": 7, "end": 14, "name": "سورة النمل" },
+        { "surah": 28, "start": 3, "end": 46, "name": "سورة القصص" },
+        { "surah": 40, "start": 23, "end": 46, "name": "سورة غافر" },
+        { "surah": 79, "start": 15, "end": 26, "name": "سورة النازعات" }
       ]
     },
     {
-      "id": "alfatiha",
-      "title": "تجربة سريعة (سورة الفاتحة)",
+      "id": "prophet_yusuf",
+      "title": "قصة سيدنا يوسف عليه السلام (القصة كاملة)",
       "sections": [
-        { "surah": 1, "start": 1, "end": 7, "name": "سورة الفاتحة" }
+        { "surah": 12, "start": 1, "end": 111, "name": "سورة يوسف" }
+      ]
+    },
+    {
+      "id": "prophet_ibrahim",
+      "title": "قصة سيدنا إبراهيم عليه السلام",
+      "sections": [
+        { "surah": 21, "start": 51, "end": 73, "name": "سورة الأنبياء" },
+        { "surah": 26, "start": 69, "end": 89, "name": "سورة الشعراء" },
+        { "surah": 37, "start": 83, "end": 113, "name": "سورة الصافات" }
+      ]
+    },
+    {
+      "id": "prophet_nuh",
+      "title": "قصة سيدنا نوح عليه السلام",
+      "sections": [
+        { "surah": 11, "start": 25, "end": 49, "name": "سورة هود" },
+        { "surah": 71, "start": 1, "end": 28, "name": "سورة نوح" }
+      ]
+    },
+    {
+      "id": "prophet_sulaiman",
+      "title": "سيدنا سليمان وملكة سبأ",
+      "sections": [
+        { "surah": 27, "start": 15, "end": 44, "name": "سورة النمل" },
+        { "surah": 34, "start": 12, "end": 14, "name": "سورة سبأ" }
+      ]
+    },
+    {
+      "id": "ayat_sakinah",
+      "title": "آيات السكينة والطمأنينة",
+      "sections": [
+        { "surah": 2, "start": 248, "end": 248, "name": "سورة البقرة" },
+        { "surah": 9, "start": 26, "end": 26, "name": "سورة التوبة" },
+        { "surah": 9, "start": 40, "end": 40, "name": "سورة التوبة" },
+        { "surah": 48, "start": 4, "end": 4, "name": "سورة الفتح" },
+        { "surah": 48, "start": 18, "end": 18, "name": "سورة الفتح" },
+        { "surah": 48, "start": 26, "end": 26, "name": "سورة الفتح" }
+      ]
+    },
+    {
+      "id": "ruqyah",
+      "title": "الرقية الشرعية من القرآن",
+      "sections": [
+        { "surah": 1, "start": 1, "end": 7, "name": "سورة الفاتحة" },
+        { "surah": 2, "start": 255, "end": 255, "name": "سورة البقرة (آية الكرسي)" },
+        { "surah": 2, "start": 285, "end": 286, "name": "سورة البقرة (الخواتيم)" },
+        { "surah": 112, "start": 1, "end": 4, "name": "سورة الإخلاص" },
+        { "surah": 113, "start": 1, "end": 5, "name": "سورة الفلق" },
+        { "surah": 114, "start": 1, "end": 6, "name": "سورة الناس" }
+      ]
+    },
+    {
+      "id": "jannah_desc",
+      "title": "وصف الجنة ونعيمها",
+      "sections": [
+        { "surah": 55, "start": 46, "end": 78, "name": "سورة الرحمن" },
+        { "surah": 56, "start": 10, "end": 38, "name": "سورة الواقعة" },
+        { "surah": 76, "start": 11, "end": 22, "name": "سورة الإنسان" },
+        { "surah": 83, "start": 22, "end": 28, "name": "سورة المطففين" }
+      ]
+    },
+    {
+      "id": "prophets_dua",
+      "title": "أدعية الأنبياء",
+      "sections": [
+        { "surah": 2, "start": 201, "end": 201, "name": "سورة البقرة" },
+        { "surah": 14, "start": 40, "end": 41, "name": "سورة إبراهيم" },
+        { "surah": 20, "start": 25, "end": 28, "name": "سورة طه" },
+        { "surah": 21, "start": 87, "end": 87, "name": "سورة الأنبياء" },
+        { "surah": 21, "start": 89, "end": 89, "name": "سورة الأنبياء" }
+      ]
+    },
+    {
+      "id": "ibad_arrahman",
+      "title": "صفات عباد الرحمن",
+      "sections": [
+        { "surah": 25, "start": 63, "end": 77, "name": "سورة الفرقان" }
+      ]
+    },
+    {
+      "id": "rizq_tawakkul",
+      "title": "آيات الرزق والتوكل",
+      "sections": [
+        { "surah": 11, "start": 6, "end": 6, "name": "سورة هود" },
+        { "surah": 51, "start": 22, "end": 23, "name": "سورة الذاريات" },
+        { "surah": 51, "start": 56, "end": 58, "name": "سورة الذاريات" },
+        { "surah": 65, "start": 2, "end": 3, "name": "سورة الطلاق" },
+        { "surah": 71, "start": 10, "end": 12, "name": "سورة نوح" }
       ]
     }
   ]
