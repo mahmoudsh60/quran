@@ -1,5 +1,8 @@
 {
-  "reciter": "ar.yasserdossari",
+  "reciters": [
+    { "folder": "Yasser_Ad-Dussary_128kbps", "name": "ياسر الدوسري" },
+    { "folder": "Alafasy_128kbps", "name": "مشاري العفاسي" }
+  ],
   "topics": [
     {
       "id": "musa",
@@ -7,6 +10,13 @@
       "sections": [
         { "surah": 20, "start": 9, "end": 98, "name": "سورة طه" },
         { "surah": 28, "start": 3, "end": 46, "name": "سورة القصص" }
+      ]
+    },
+    {
+      "id": "alfatiha",
+      "title": "تجربة سريعة (سورة الفاتحة)",
+      "sections": [
+        { "surah": 1, "start": 1, "end": 7, "name": "سورة الفاتحة" }
       ]
     }
   ]
