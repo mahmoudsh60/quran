@@ -9,19 +9,26 @@ const statusDiv = document.getElementById('status');
 const playBtn = document.getElementById('playBtn');
 const ayahImage = document.getElementById('ayahImage');
 
-// العناصر الجديدة
 const playbackControls = document.getElementById('playbackControls');
 const ayahSelect = document.getElementById('ayahSelect');
 const nextBtn = document.getElementById('nextBtn');
 const prevBtn = document.getElementById('prevBtn');
 
-// كائن صوتي مخفي وظيفته يحمل الآية اللي عليها الدور في الخلفية
+// كائن صوتي مخفي للتحميل المسبق
 const preloader = new Audio(); 
 
+// جلب البيانات وبناء القوائم
 fetch('data.json')
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) throw new Error("Network response was not ok");
+        return response.json();
+    })
     .then(data => {
         quranData = data;
+        
+        // تفريغ القوائم أولاً لضمان عدم التكرار
+        reciterSelect.innerHTML = "";
+        topicSelect.innerHTML = "";
         
         data.reciters.forEach(reciter => {
             let option = document.createElement('option');
@@ -37,34 +44,38 @@ fetch('data.json')
             topicSelect.appendChild(option);
         });
     })
-    .catch(error => console.error("Error loading JSON:", error));
+    .catch(error => {
+        console.error("Error loading JSON:", error);
+        statusDiv.innerText = "حدث خطأ في تحميل البيانات، يرجى تحديث الصفحة.";
+        statusDiv.style.color = "red";
+    });
 
 function buildPlaylistAndPlay() {
     playlist = [];
     currentIndex = 0;
-    ayahSelect.innerHTML = ""; // تفريغ قائمة الآيات القديمة
+    ayahSelect.innerHTML = ""; 
     
     const selectedTopicId = topicSelect.value;
     const selectedTopic = quranData.topics.find(t => t.id === selectedTopicId);
     
+    if(!selectedTopic) return; // حماية إضافية لو البيانات لسه محملتش
+
     selectedTopic.sections.forEach(section => {
         for(let i = section.start; i <= section.end; i++) {
             let ayahObj = { surah: section.surah, ayah: i, surahName: section.name };
             playlist.push(ayahObj);
             
-            // إضافة الآية لقائمة التصفح السريع
             let option = document.createElement('option');
-            option.value = playlist.length - 1; // الـ Index بتاعها
+            option.value = playlist.length - 1; 
             option.innerText = `${section.name} - آية ${i}`;
             ayahSelect.appendChild(option);
         }
     });
     
-    playbackControls.style.display = "block"; // إظهار شريط التحكم
+    playbackControls.style.display = "block"; 
     playAyah(currentIndex);
 }
 
-// دالة التحميل المسبق للآية التالية (عشان نلغي التقطيع)
 function preloadNextAyah(index) {
     if (index + 1 < playlist.length) {
         const nextAyah = playlist[index + 1];
@@ -84,7 +95,7 @@ function playAyah(index) {
     }
 
     currentIndex = index;
-    ayahSelect.value = currentIndex; // تحديث القائمة المنسدلة لتطابق الآية الحالية
+    ayahSelect.value = currentIndex; 
 
     const currentAyah = playlist[currentIndex];
     const reciterFolder = reciterSelect.value;
@@ -106,11 +117,9 @@ function playAyah(index) {
         setTimeout(playNext, 1500); 
     });
 
-    // استدعاء التحميل المسبق للآية اللي جاية في الخلفية
     preloadNextAyah(currentIndex);
 }
 
-// دوال التنقل
 function playNext() {
     if (currentIndex + 1 < playlist.length) playAyah(currentIndex + 1);
 }
@@ -119,13 +128,11 @@ function playPrev() {
     if (currentIndex - 1 >= 0) playAyah(currentIndex - 1);
 }
 
-// ربط الأحداث بالأزرار
 playBtn.addEventListener('click', buildPlaylistAndPlay);
 nextBtn.addEventListener('click', playNext);
 prevBtn.addEventListener('click', playPrev);
 audioPlayer.addEventListener('ended', playNext);
 
-// لما المستخدم يختار آية من القائمة المنسدلة
 ayahSelect.addEventListener('change', (e) => {
     playAyah(parseInt(e.target.value));
 });
