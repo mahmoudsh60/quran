@@ -8,14 +8,16 @@ const playBtn = document.getElementById('playBtn');
 fetch('data.json')
     .then(response => response.json())
     .then(data => {
+        // سحب موضوع سيدنا موسى (أول موضوع في الملف)
         const musaTopic = data.topics[0]; 
         
+        // توليد طابور التشغيل (الآيات بالترتيب)
         musaTopic.sections.forEach(section => {
             for(let i = section.start; i <= section.end; i++) {
                 playlist.push({ surah: section.surah, ayah: i, surahName: section.name });
             }
         });
-        statusDiv.innerText = `تم تحميل ${playlist.length} آية بنجاح.`;
+        statusDiv.innerText = `تم تحميل ${playlist.length} آية بنجاح. جاهز للتشغيل...`;
     })
     .catch(error => console.error("Error loading JSON:", error));
 
@@ -29,32 +31,36 @@ function playAyah(index) {
     const currentAyah = playlist[index];
     statusDiv.innerText = `جاري تشغيل: ${currentAyah.surahName} - آية رقم ${currentAyah.ayah}`;
 
-    // تظبيط الأرقام عشان تناسب صيغة EveryAyah (إضافة أصفار على الشمال)
+    // تظبيط الأرقام عشان تناسب مكتبة EveryAyah
     // سورة 20 وآية 9 هتبقى 020009
     const surahFormatted = String(currentAyah.surah).padStart(3, '0');
     const ayahFormatted = String(currentAyah.ayah).padStart(3, '0');
     
-    // رابط الشيخ ياسر الدوسري المباشر
+    // رابط الشيخ ياسر الدوسري المباشر 
     const audioUrl = `https://everyayah.com/data/Yasser_Ad-Dussary_128kbps/${surahFormatted}${ayahFormatted}.mp3`;
 
     audioPlayer.src = audioUrl;
     
-    // تشغيل الصوت مع التعامل مع أي تأخير في التحميل
+    // تشغيل الصوت مع التعامل مع أي تأخير 
     audioPlayer.play().catch(err => {
         console.error("مشكلة في تشغيل الآية:", err);
-        statusDiv.innerText = "حدث خطأ في جلب الآية، جاري الانتقال للتالية...";
-        setTimeout(playNext, 1500); // انتظار ثانية ونص قبل التخطي
+        statusDiv.innerText = "جاري الانتقال للآية التالية...";
+        // استنى ثانية ونص قبل التخطي عشان الموقع ما يعلقش
+        setTimeout(playNext, 1500); 
     });
 }
 
+// دالة الانتقال للآية اللي بعدها
 function playNext() {
     currentIndex++;
     playAyah(currentIndex);
 }
 
+// زرار التشغيل
 playBtn.addEventListener('click', () => {
     currentIndex = 0;
     playAyah(currentIndex);
 });
 
+// لما الآية تخلص شغل اللي بعدها أوتوماتيك
 audioPlayer.addEventListener('ended', playNext);
