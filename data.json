@@ -1,0 +1,13 @@
+{
+  "reciter": "ar.yasserdossari",
+  "topics": [
+    {
+      "id": "musa",
+      "title": "قصة سيدنا موسى عليه السلام",
+      "sections": [
+        { "surah": 20, "start": 9, "end": 98, "name": "سورة طه" },
+        { "surah": 28, "start": 3, "end": 46, "name": "سورة القصص" }
+      ]
+    }
+  ]
+}
