@@ -4,136 +4,111 @@ let quranData = {};
 
 const reciterSelect = document.getElementById('reciterSelect');
 const topicSelect = document.getElementById('topicSelect');
-const audioPlayer = document.getElementById('audioPlayer');
 const statusDiv = document.getElementById('status');
 const playBtn = document.getElementById('playBtn');
 const ayahImage = document.getElementById('ayahImage');
-
 const playbackControls = document.getElementById('playbackControls');
 const ayahSelect = document.getElementById('ayahSelect');
-const nextBtn = document.getElementById('nextBtn');
-const prevBtn = document.getElementById('prevBtn');
 
-const preloader = new Audio(); 
+// المشغلات
+let audioPlayers = [document.getElementById('audioA'), document.getElementById('audioB')];
+let currentPlayerIndex = 0; // بيتبدل بين 0 و 1
 
-// السر هنا: إضافة وقت عشوائي للرابط تمنع الكاش نهائياً
 fetch('data.json?v=' + new Date().getTime())
-    .then(response => {
-        if (!response.ok) throw new Error("Network response was not ok");
-        return response.json();
-    })
+    .then(r => r.json())
     .then(data => {
         quranData = data;
-        
-        reciterSelect.innerHTML = "";
-        topicSelect.innerHTML = "";
-        
-        // لو البيانات القديمة هي اللي اتحملت، الكود مش هيكمل وهيرمي خطأ
-        if(!data.reciters) throw new Error("بيانات الشيوخ غير موجودة (كاش قديم)");
-
-        data.reciters.forEach(reciter => {
-            let option = document.createElement('option');
-            option.value = reciter.folder;
-            option.innerText = reciter.name;
-            reciterSelect.appendChild(option);
+        data.reciters.forEach(r => {
+            let op = new Option(r.name, r.folder);
+            reciterSelect.add(op);
         });
-
-        data.topics.forEach(topic => {
-            let option = document.createElement('option');
-            option.value = topic.id;
-            option.innerText = topic.title;
-            topicSelect.appendChild(option);
+        data.topics.forEach(t => {
+            let op = new Option(t.title, t.id);
+            topicSelect.add(op);
         });
-    })
-    .catch(error => {
-        console.error("Error loading JSON:", error);
-        statusDiv.innerText = "حدث خطأ في تحميل البيانات، يرجى تحديث الصفحة.";
-        statusDiv.style.color = "red";
+        statusDiv.innerText = "جاهز. اختر موضوعاً وابدأ.";
     });
 
 function buildPlaylistAndPlay() {
     playlist = [];
     currentIndex = 0;
-    ayahSelect.innerHTML = ""; 
+    ayahSelect.innerHTML = "";
+    const selectedTopic = quranData.topics.find(t => t.id === topicSelect.value);
     
-    const selectedTopicId = topicSelect.value;
-    const selectedTopic = quranData.topics.find(t => t.id === selectedTopicId);
-    
-    if(!selectedTopic) return; 
-
     selectedTopic.sections.forEach(section => {
         for(let i = section.start; i <= section.end; i++) {
-            let ayahObj = { surah: section.surah, ayah: i, surahName: section.name };
-            playlist.push(ayahObj);
-            
-            let option = document.createElement('option');
-            option.value = playlist.length - 1; 
-            option.innerText = `${section.name} - آية ${i}`;
-            ayahSelect.appendChild(option);
+            playlist.push({ surah: section.surah, ayah: i, name: section.name });
+            ayahSelect.add(new Option(`${section.name} - ${i}`, playlist.length - 1));
         }
     });
     
-    playbackControls.style.display = "block"; 
-    playAyah(currentIndex);
+    playbackControls.style.display = "block";
+    playAyah(0);
 }
 
-function preloadNextAyah(index) {
-    if (index + 1 < playlist.length) {
-        const nextAyah = playlist[index + 1];
-        const reciterFolder = reciterSelect.value;
-        const s = String(nextAyah.surah).padStart(3, '0');
-        const a = String(nextAyah.ayah).padStart(3, '0');
-        preloader.src = `https://everyayah.com/data/${reciterFolder}/${s}${a}.mp3`;
-        preloader.preload = "auto";
-    }
+function getAudioUrl(index) {
+    const item = playlist[index];
+    const s = String(item.surah).padStart(3, '0');
+    const a = String(item.ayah).padStart(3, '0');
+    return `https://everyayah.com/data/${reciterSelect.value}/${s}${a}.mp3`;
 }
 
 function playAyah(index) {
-    if (index < 0 || index >= playlist.length) {
-        statusDiv.innerText = "انتهت التلاوة.";
-        ayahImage.style.display = "none";
+    if (index >= playlist.length) {
+        statusDiv.innerText = "انتهى الموضوع.";
         return;
     }
-
     currentIndex = index;
-    ayahSelect.value = currentIndex; 
-
-    const currentAyah = playlist[currentIndex];
-    const reciterFolder = reciterSelect.value;
+    ayahSelect.value = currentIndex;
     
-    statusDiv.innerText = `جاري تشغيل: ${currentAyah.surahName} - آية رقم ${currentAyah.ayah}`;
-
-    const surahAudioFormatted = String(currentAyah.surah).padStart(3, '0');
-    const ayahAudioFormatted = String(currentAyah.ayah).padStart(3, '0');
-    const audioUrl = `https://everyayah.com/data/${reciterFolder}/${surahAudioFormatted}${ayahAudioFormatted}.mp3`;
-
-    const imageUrl = `https://everyayah.com/data/images_png/${currentAyah.surah}_${currentAyah.ayah}.png`;
-
-    audioPlayer.src = audioUrl;
-    ayahImage.src = imageUrl;
-    ayahImage.style.display = "block"; 
+    const nextPlayerIndex = (currentPlayerIndex + 1) % 2;
+    const activePlayer = audioPlayers[currentPlayerIndex];
+    const nextPlayer = audioPlayers[nextPlayerIndex];
     
-    audioPlayer.play().catch(err => {
-        console.error("مشكلة في تشغيل الآية:", err);
-        setTimeout(playNext, 1500); 
-    });
+    const item = playlist[index];
+    statusDiv.innerText = `تلاوة: ${item.name} - آية ${item.ayah}`;
+    ayahImage.src = `https://everyayah.com/data/images_png/${item.surah}_${item.ayah}.png`;
+    ayahImage.style.display = "block";
 
-    preloadNextAyah(currentIndex);
+    // تشغيل الحالي
+    activePlayer.src = getAudioUrl(index);
+    activePlayer.volume = 1;
+    activePlayer.play();
+
+    // التحميل المسبق للآية التالية في المشغل التاني
+    if (index + 1 < playlist.length) {
+        nextPlayer.src = getAudioUrl(index + 1);
+        nextPlayer.pause(); // نجهزه بس
+    }
+
+    // مراقبة الوقت للتبديل (قبل النهاية بـ 0.8 ثانية)
+    const checkTime = setInterval(() => {
+        if (activePlayer.duration - activePlayer.currentTime < 0.8) {
+            clearInterval(checkTime);
+            startTransition();
+        }
+    }, 100);
 }
 
-function playNext() {
-    if (currentIndex + 1 < playlist.length) playAyah(currentIndex + 1);
+function startTransition() {
+    const nextIndex = currentIndex + 1;
+    if (nextIndex >= playlist.length) return;
+
+    currentPlayerIndex = (currentPlayerIndex + 1) % 2;
+    playAyah(nextIndex);
 }
 
-function playPrev() {
-    if (currentIndex - 1 >= 0) playAyah(currentIndex - 1);
-}
-
-playBtn.addEventListener('click', buildPlaylistAndPlay);
-nextBtn.addEventListener('click', playNext);
-prevBtn.addEventListener('click', playPrev);
-audioPlayer.addEventListener('ended', playNext);
-
-ayahSelect.addEventListener('change', (e) => {
+// أزرار التحكم
+document.getElementById('nextBtn').onclick = () => {
+    audioPlayers.forEach(p => p.pause());
+    playAyah(currentIndex + 1);
+};
+document.getElementById('prevBtn').onclick = () => {
+    audioPlayers.forEach(p => p.pause());
+    playAyah(currentIndex - 1);
+};
+playBtn.onclick = buildPlaylistAndPlay;
+ayahSelect.onchange = (e) => {
+    audioPlayers.forEach(p => p.pause());
     playAyah(parseInt(e.target.value));
-});
+};
