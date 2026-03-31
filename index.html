@@ -3,29 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المصحف الموضوعي - قصة سيدنا موسى</title>
+    <title>المصحف الموضوعي</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px; background-color: #f4f4f9; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f9; }
+        .container { max-width: 700px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         h1 { color: #2c3e50; }
-        button { background-color: #3498db; color: white; border: none; padding: 10px 20px; font-size: 18px; border-radius: 5px; cursor: pointer; margin-top: 20px; }
-        button:hover { background-color: #2980b9; }
-        #status { margin-top: 20px; font-weight: bold; color: #27ae60; }
+        .selectors { display: flex; flex-direction: column; gap: 15px; margin: 20px 0; text-align: right;}
+        select { padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; font-family: inherit;}
+        button { background-color: #27ae60; color: white; border: none; padding: 12px 25px; font-size: 18px; border-radius: 5px; cursor: pointer; width: 100%; font-family: inherit; font-weight: bold;}
+        button:hover { background-color: #219150; }
+        #status { margin-top: 15px; font-weight: bold; color: #34495e; font-size: 18px; }
         audio { width: 100%; margin-top: 20px; }
+        #ayahImage { max-width: 100%; margin-top: 20px; min-height: 100px; border-radius: 5px; padding: 10px; background: #fffdf5; border: 1px solid #eee;}
     </style>
 </head>
 <body>
 
     <div class="container">
         <h1>المصحف الموضوعي</h1>
-        <p>استمع إلى قصة سيدنا موسى عليه السلام بصوت الشيخ ياسر الدوسري</p>
         
-        <button id="playBtn">تشغيل القائمة</button>
-        <div id="status">جاهز للتشغيل...</div>
+        <div class="selectors">
+            <label>اختر القارئ:</label>
+            <select id="reciterSelect"></select>
+
+            <label>اختر الموضوع:</label>
+            <select id="topicSelect"></select>
+        </div>
+
+        <button id="playBtn">بدء التلاوة</button>
+        
+        <div id="status">الرجاء اختيار الموضوع والضغط على بدء التلاوة...</div>
+        
+        <img id="ayahImage" src="" alt="صورة الآية ستظهر هنا" style="display: none;">
         
         <audio id="audioPlayer" controls></audio>
     </div>
 
-    <script src="script.js?v=2"></script>
+    <script src="script.js?v=3"></script> 
 </body>
 </html>
