@@ -14,11 +14,10 @@ const ayahSelect = document.getElementById('ayahSelect');
 const nextBtn = document.getElementById('nextBtn');
 const prevBtn = document.getElementById('prevBtn');
 
-// كائن صوتي مخفي للتحميل المسبق
 const preloader = new Audio(); 
 
-// جلب البيانات وبناء القوائم
-fetch('data.json')
+// السر هنا: إضافة وقت عشوائي للرابط تمنع الكاش نهائياً
+fetch('data.json?v=' + new Date().getTime())
     .then(response => {
         if (!response.ok) throw new Error("Network response was not ok");
         return response.json();
@@ -26,10 +25,12 @@ fetch('data.json')
     .then(data => {
         quranData = data;
         
-        // تفريغ القوائم أولاً لضمان عدم التكرار
         reciterSelect.innerHTML = "";
         topicSelect.innerHTML = "";
         
+        // لو البيانات القديمة هي اللي اتحملت، الكود مش هيكمل وهيرمي خطأ
+        if(!data.reciters) throw new Error("بيانات الشيوخ غير موجودة (كاش قديم)");
+
         data.reciters.forEach(reciter => {
             let option = document.createElement('option');
             option.value = reciter.folder;
@@ -58,7 +59,7 @@ function buildPlaylistAndPlay() {
     const selectedTopicId = topicSelect.value;
     const selectedTopic = quranData.topics.find(t => t.id === selectedTopicId);
     
-    if(!selectedTopic) return; // حماية إضافية لو البيانات لسه محملتش
+    if(!selectedTopic) return; 
 
     selectedTopic.sections.forEach(section => {
         for(let i = section.start; i <= section.end; i++) {
