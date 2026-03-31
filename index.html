@@ -7,22 +7,22 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f9; }
         .container { max-width: 700px; margin: auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; }
+        h1 { color: #2c3e50; margin-bottom: 30px; }
         .selectors { display: flex; flex-direction: column; gap: 15px; margin: 20px 0; text-align: right;}
-        select { padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; font-family: inherit;}
-        button { background-color: #27ae60; color: white; border: none; padding: 12px 25px; font-size: 18px; border-radius: 5px; cursor: pointer; width: 100%; font-family: inherit; font-weight: bold;}
-        button:hover { background-color: #219150; }
+        select { padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #ddd; width: 100%; outline: none; }
+        button#playBtn { background-color: #27ae60; color: white; border: none; padding: 15px; font-size: 18px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; transition: 0.3s; }
+        button#playBtn:hover { background-color: #219150; transform: translateY(-2px); }
         
-        /* تنسيق أدوات التحكم الجديدة */
-        .playback-controls { display: none; margin-top: 20px; background: #ecf0f1; padding: 15px; border-radius: 8px; }
-        .nav-buttons { display: flex; justify-content: space-between; gap: 10px; align-items: center;}
-        .nav-btn { background-color: #3498db; width: auto; padding: 10px 15px; font-size: 16px; }
-        .nav-btn:hover { background-color: #2980b9; }
-        #ayahSelect { flex-grow: 1; max-width: 50%; }
+        .playback-controls { display: none; margin-top: 25px; background: #f8f9fa; padding: 20px; border-radius: 12px; border: 1px solid #eee; }
+        .nav-buttons { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 15px;}
+        .nav-btn { background-color: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px; flex: 1; }
+        #ayahSelect { flex: 2; padding: 8px; }
 
-        #status { margin-top: 15px; font-weight: bold; color: #34495e; font-size: 18px; }
-        audio { width: 100%; margin-top: 20px; outline: none; }
-        #ayahImage { max-width: 100%; margin-top: 20px; min-height: 100px; border-radius: 5px; padding: 10px; background: #fffdf5; border: 1px solid #eee;}
+        #status { margin-top: 15px; font-weight: 500; color: #7f8c8d; min-height: 24px; }
+        #ayahImage { max-width: 100%; margin: 25px 0; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: none; transition: opacity 0.5s; }
+        
+        /* إخفاء مشغلات الصوت الحقيقية */
+        audio { display: none; }
     </style>
 </head>
 <body>
@@ -38,9 +38,9 @@
             <select id="topicSelect"></select>
         </div>
 
-        <button id="playBtn">بدء التلاوة</button>
+        <button id="playBtn">بدء الاستماع</button>
         
-        <div id="status">الرجاء اختيار الموضوع والضغط على بدء التلاوة...</div>
+        <div id="status">جاهز للتحميل...</div>
         
         <div class="playback-controls" id="playbackControls">
             <div class="nav-buttons">
@@ -48,13 +48,15 @@
                 <select id="ayahSelect"></select>
                 <button class="nav-btn" id="prevBtn">⏮️ السابق</button>
             </div>
+            <p style="font-size: 12px; color: #999;">تداخل ذكي مفعل لضمان عدم انقطاع التلاوة</p>
         </div>
         
-        <img id="ayahImage" src="" alt="صورة الآية ستظهر هنا" style="display: none;">
+        <img id="ayahImage" src="" alt="الآية الكريمة">
         
-        <audio id="audioPlayer" controls></audio>
+        <audio id="audioA"></audio>
+        <audio id="audioB"></audio>
     </div>
 
-    <script src="script.js?v=5"></script> 
+    <script src="script.js?v=6"></script> 
 </body>
 </html>
