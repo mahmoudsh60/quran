@@ -12,6 +12,14 @@
         select { padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; font-family: inherit;}
         button { background-color: #27ae60; color: white; border: none; padding: 12px 25px; font-size: 18px; border-radius: 5px; cursor: pointer; width: 100%; font-family: inherit; font-weight: bold;}
         button:hover { background-color: #219150; }
+        
+        /* تنسيق أدوات التحكم الجديدة */
+        .playback-controls { display: none; margin-top: 20px; background: #ecf0f1; padding: 15px; border-radius: 8px; }
+        .nav-buttons { display: flex; justify-content: space-between; gap: 10px; align-items: center;}
+        .nav-btn { background-color: #3498db; width: auto; padding: 10px 15px; font-size: 16px; }
+        .nav-btn:hover { background-color: #2980b9; }
+        #ayahSelect { flex-grow: 1; max-width: 50%; }
+
         #status { margin-top: 15px; font-weight: bold; color: #34495e; font-size: 18px; }
         audio { width: 100%; margin-top: 20px; }
         #ayahImage { max-width: 100%; margin-top: 20px; min-height: 100px; border-radius: 5px; padding: 10px; background: #fffdf5; border: 1px solid #eee;}
@@ -34,11 +42,19 @@
         
         <div id="status">الرجاء اختيار الموضوع والضغط على بدء التلاوة...</div>
         
+        <div class="playback-controls" id="playbackControls">
+            <div class="nav-buttons">
+                <button class="nav-btn" id="nextBtn">التالي ⏭️</button>
+                <select id="ayahSelect"></select>
+                <button class="nav-btn" id="prevBtn">⏮️ السابق</button>
+            </div>
+        </div>
+        
         <img id="ayahImage" src="" alt="صورة الآية ستظهر هنا" style="display: none;">
         
         <audio id="audioPlayer" controls></audio>
     </div>
 
-    <script src="script.js?v=3"></script> 
+    <script src="script.js?v=4"></script> 
 </body>
 </html>
