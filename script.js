@@ -16,10 +16,23 @@ const playbackControls = document.getElementById('playbackControls');
 const ayahSelect = document.getElementById('ayahSelect');
 const pauseBtn = document.getElementById('pauseBtn'); 
 
+// عناصر التفسير
+const toggleTafsirBtn = document.getElementById('toggleTafsirBtn');
+const tafsirContainer = document.getElementById('tafsirContainer');
+const tafsirText = document.getElementById('tafsirText');
+let isTafsirVisible = false;
+
 let audioPlayers = [document.getElementById('audioA'), document.getElementById('audioB')];
 let currentPlayerIndex = 0; 
 let isPaused = false;
 let checkTimeInterval;
+
+// إظهار وإخفاء التفسير
+toggleTafsirBtn.onclick = () => {
+    isTafsirVisible = !isTafsirVisible;
+    tafsirContainer.style.display = isTafsirVisible ? "block" : "none";
+    toggleTafsirBtn.innerText = isTafsirVisible ? "📖 إخفاء التفسير" : "📖 إظهار التفسير الميسر";
+};
 
 fetch('data.json?v=' + new Date().getTime())
     .then(r => r.json())
@@ -53,13 +66,11 @@ function buildPlaylistAndPlay() {
     playlist = [];
     currentIndex = 0;
     ayahSelect.innerHTML = "";
-    
     let lastSurahId = -1;
 
     if (typeSelect.value === 'subjective') {
         const selectedTopic = quranData.topics.find(t => t.id === contentSelect.value);
         selectedTopic.sections.forEach(section => {
-            // إضافة البسملة إذا كانت السورة قد تغيرت وليست سورة التوبة (رقم 9)
             if (section.surah !== lastSurahId && section.surah !== 9) {
                 playlist.push({ isBasmala: true });
                 ayahSelect.add(new Option(`--- بسم الله الرحمن الرحيم ---`, playlist.length - 1));
@@ -76,7 +87,6 @@ function buildPlaylistAndPlay() {
         const surahName = surahNames[surahId - 1];
         const totalAyahs = surahCounts[surahId - 1];
         
-        // إضافة البسملة في بداية السورة (إلا لو كانت التوبة)
         if (surahId !== 9) {
             playlist.push({ isBasmala: true });
             ayahSelect.add(new Option(`--- بسم الله الرحمن الرحيم ---`, playlist.length - 1));
@@ -96,20 +106,36 @@ function getAudioUrl(index) {
     const item = playlist[index];
     const reciterFolder = reciterSelect.value;
     
-    if (item.isBasmala) {
-        // رابط البسملة الثابت (الآية 1 من السورة 1)
-        return `https://everyayah.com/data/${reciterFolder}/001001.mp3`;
-    }
+    if (item.isBasmala) return `https://everyayah.com/data/${reciterFolder}/001001.mp3`;
 
     const s = String(item.surah).padStart(3, '0');
     const a = String(item.ayah).padStart(3, '0');
     return `https://everyayah.com/data/${reciterFolder}/${s}${a}.mp3`;
 }
 
+// دالة جلب التفسير
+function fetchTafsir(surah, ayah) {
+    tafsirText.innerText = "جاري تحميل التفسير...";
+    fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.muyassar`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.data && data.data.text) {
+                tafsirText.innerText = data.data.text;
+            } else {
+                tafsirText.innerText = "التفسير غير متاح حالياً.";
+            }
+        })
+        .catch(err => {
+            console.error("Error fetching tafsir:", err);
+            tafsirText.innerText = "حدث خطأ في تحميل التفسير. تأكد من اتصال الإنترنت.";
+        });
+}
+
 function playAyah(index) {
     if (index >= playlist.length) {
         statusDiv.innerText = "انتهت التلاوة.";
         ayahImage.style.display = "none";
+        tafsirContainer.style.display = "none";
         return;
     }
     
@@ -130,10 +156,12 @@ function playAyah(index) {
     
     if (item.isBasmala) {
         statusDiv.innerText = "تلاوة: بسم الله الرحمن الرحيم";
-        ayahImage.src = `https://everyayah.com/data/images_png/1_1.png`; // صورة البسملة
+        ayahImage.src = `https://everyayah.com/data/images_png/1_1.png`;
+        tafsirText.innerText = "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ."; // تفسير افتراضي للبسملة
     } else {
         statusDiv.innerText = `تلاوة: ${item.name} - آية ${item.ayah}`;
         ayahImage.src = `https://everyayah.com/data/images_png/${item.surah}_${item.ayah}.png`;
+        fetchTafsir(item.surah, item.ayah); // استدعاء التفسير أوتوماتيك
     }
     
     ayahImage.style.display = "block";
