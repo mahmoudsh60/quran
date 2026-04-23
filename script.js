@@ -16,7 +16,6 @@ const playbackControls = document.getElementById('playbackControls');
 const ayahSelect = document.getElementById('ayahSelect');
 const pauseBtn = document.getElementById('pauseBtn'); 
 
-// عناصر التفسير
 const toggleTafsirBtn = document.getElementById('toggleTafsirBtn');
 const tafsirContainer = document.getElementById('tafsirContainer');
 const tafsirText = document.getElementById('tafsirText');
@@ -27,7 +26,6 @@ let currentPlayerIndex = 0;
 let isPaused = false;
 let checkTimeInterval;
 
-// إظهار وإخفاء التفسير
 toggleTafsirBtn.onclick = () => {
     isTafsirVisible = !isTafsirVisible;
     tafsirContainer.style.display = isTafsirVisible ? "block" : "none";
@@ -113,7 +111,6 @@ function getAudioUrl(index) {
     return `https://everyayah.com/data/${reciterFolder}/${s}${a}.mp3`;
 }
 
-// دالة جلب التفسير
 function fetchTafsir(surah, ayah) {
     tafsirText.innerText = "جاري تحميل التفسير...";
     fetch(`https://api.alquran.cloud/v1/ayah/${surah}:${ayah}/ar.muyassar`)
@@ -157,11 +154,11 @@ function playAyah(index) {
     if (item.isBasmala) {
         statusDiv.innerText = "تلاوة: بسم الله الرحمن الرحيم";
         ayahImage.src = `https://everyayah.com/data/images_png/1_1.png`;
-        tafsirText.innerText = "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ."; // تفسير افتراضي للبسملة
+        tafsirText.innerText = "بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ."; 
     } else {
         statusDiv.innerText = `تلاوة: ${item.name} - آية ${item.ayah}`;
         ayahImage.src = `https://everyayah.com/data/images_png/${item.surah}_${item.ayah}.png`;
-        fetchTafsir(item.surah, item.ayah); // استدعاء التفسير أوتوماتيك
+        fetchTafsir(item.surah, item.ayah); 
     }
     
     ayahImage.style.display = "block";
