@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#10b981">
     <title>المصحف الموضوعي والشامل</title>
     <link rel="manifest" href="manifest.json">
@@ -23,40 +23,71 @@
 
         body { 
             font-family: 'Cairo', sans-serif; 
-            text-align: center; 
-            margin: 0;
-            padding: 15px; 
-            background-color: var(--bg-color);
-            color: var(--text-main);
+            text-align: center; margin: 0; padding: 15px; 
+            background-color: var(--bg-color); color: var(--text-main);
             background-image: radial-gradient(var(--glass-border) 2px, transparent 2px);
-            background-size: 30px 30px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background-size: 30px 30px; min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        h1 { color: var(--accent); margin-bottom: 5px; font-size: 24px;}
-        .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 15px; }
+        h1 { color: var(--accent); margin-bottom: 5px; font-size: 26px;}
+        .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
         
-        #openMenuBtn {
+        .top-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 600px;}
+        
+        .main-btn {
             background: var(--panel-bg); color: var(--text-main);
-            border: 1px solid var(--glass-border); padding: 10px 20px;
-            border-radius: 20px; cursor: pointer; backdrop-filter: blur(10px);
-            font-family: 'Cairo', sans-serif; font-weight: bold; margin-bottom: 20px;
-            transition: 0.3s; z-index: 100;
+            border: 1px solid var(--glass-border); padding: 12px 15px;
+            border-radius: 15px; cursor: pointer; backdrop-filter: blur(10px);
+            font-family: 'Cairo', sans-serif; font-weight: bold; transition: 0.3s; font-size: 15px; flex: 1; min-width: 140px;
         }
-        #openMenuBtn:hover { border-color: var(--accent); }
-
-        /* زر استكمال التلاوة المحفوظة */
-        #resumeBtn {
-            background-color: #3b82f6; color: white; border: none; padding: 10px 20px;
-            border-radius: 20px; font-family: 'Cairo', sans-serif; font-weight: bold;
-            margin-bottom: 15px; cursor: pointer; display: none; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
-            animation: pulse 2s infinite;
-        }
+        .main-btn:hover { border-color: var(--accent); }
+        
+        #resumeBtn { background-color: #3b82f6; color: white; display: none; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4); animation: pulse 2s infinite;}
+        #installAppBtn { background-color: #8b5cf6; color: white; display: none; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
+        /* منطقة العرض الرئيسية */
+        .main-display { width: 100%; max-width: 600px; flex-grow: 1; display: flex; flex-direction: column; align-items: center;}
+
+        /* اسم الموضوع فوق السورة */
+        #currentTopicName { color: #fcd34d; font-size: 18px; margin: 0 0 5px 0; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        #status { font-weight: bold; color: var(--accent); font-size: 16px; min-height: 24px; margin-bottom: 15px;}
+        
+        #ayahImage { 
+            width: 100%; max-height: 35vh; object-fit: contain; margin-bottom: 15px; 
+            border-radius: 15px; background: rgba(255, 255, 255, 0.95); padding: 10px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: none; box-sizing: border-box;
+        }
+
+        /* التفسير تحت الآية مباشرة */
+        .tafsir-box { display: none; width: 100%; margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-right: 4px solid var(--accent); border-radius: 10px; text-align: right; font-size: 15px; line-height: 1.8; color: var(--text-muted); box-sizing: border-box;}
+        .tafsir-box strong { color: var(--accent); display: block; margin-bottom: 8px;}
+
+        .playback-controls { display: none; width: 100%; }
+        
+        /* شريط الحفظ والسرعة الخارجي */
+        .memorization-bar { background: rgba(30, 41, 59, 0.6); padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--glass-border); width: 100%; box-sizing: border-box;}
+        .mem-title { color: var(--accent); font-size: 14px; font-weight: bold; margin-bottom: 12px; text-align: right; display: block;}
+        .mem-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;}
+        .mem-row input, .mem-row select { padding: 10px; font-size: 15px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.8); color: var(--text-main); font-family: 'Cairo'; flex: 1; min-width: 80px; text-align: center; outline: none;}
+        #applyRepeatBtn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; font-family: 'Cairo'; font-size: 16px; transition: 0.3s;}
+        
+        #ayahSelect { margin-bottom: 15px; background-color: rgba(30, 41, 59, 0.8); border: 1px solid var(--accent); font-weight: bold; width: 100%; padding: 12px; border-radius: 10px; color: var(--text-main); font-family: 'Cairo'; outline: none;}
+        
+        .nav-buttons { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; width: 100%;}
+        .nav-btn { background-color: rgba(255,255,255,0.1); color: var(--text-main); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; cursor: pointer; font-size: 18px; flex: 1; font-family: 'Cairo', sans-serif;}
+        #pauseBtn { background-color: var(--danger); border: none; color: #fff; font-weight: bold; flex: 1.5;}
+
+        .extra-buttons { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; width: 100%;}
+        .extra-btn { flex: 1; background-color: transparent; border: 1px solid var(--glass-border); color: var(--text-main); padding: 12px; border-radius: 12px; font-family: 'Cairo'; font-size: 14px; cursor: pointer; min-width: 30%; font-weight: bold; transition: 0.3s;}
+        .extra-btn:hover { background-color: rgba(255,255,255,0.1); }
+        #toggleTafsirBtn { border-color: var(--accent); color: var(--accent); }
+        #shareBtn { border-color: #3b82f6; color: #3b82f6;}
+        #loopToggleBtn { border-color: var(--danger); color: var(--danger); }
+        #loopToggleBtn.active { background-color: var(--danger); color: white; }
+        
+        /* اللوحة الطائرة للإعدادات */
         .floating-panel {
             position: fixed; bottom: -100%; left: 0; width: 100%;
             background: var(--panel-bg); backdrop-filter: blur(15px);
@@ -64,82 +95,83 @@
             padding: 25px 20px; box-sizing: border-box;
             transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000; max-height: 85vh; overflow-y: auto;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
         }
         .floating-panel.active { bottom: 0; }
-
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .close-btn { background: none; border: none; color: var(--text-main); font-size: 24px; cursor: pointer; }
+        .close-btn { background: none; border: none; color: var(--text-main); font-size: 28px; cursor: pointer; }
 
         .selectors { display: flex; flex-direction: column; gap: 15px; text-align: right; margin-bottom: 20px;}
-        label { color: var(--text-muted); font-size: 14px; }
-        select, input { 
-            padding: 12px; font-size: 15px; border-radius: 10px; 
-            border: 1px solid var(--glass-border); width: 100%; 
-            outline: none; background-color: rgba(15, 23, 42, 0.6); 
-            color: var(--text-main); font-family: 'Cairo', sans-serif; box-sizing: border-box;
-        }
-        
-        .repeat-options { display: none; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-top: 10px; border: 1px solid var(--glass-border);}
-        .repeat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;}
+        .selectors label { color: var(--text-muted); font-size: 15px; }
+        .selectors select { padding: 12px; font-size: 16px; border-radius: 12px; border: 1px solid var(--glass-border); width: 100%; outline: none; background-color: rgba(15, 23, 42, 0.9); color: var(--text-main); font-family: 'Cairo', sans-serif; box-sizing: border-box;}
 
-        button#playBtn { background-color: var(--accent); color: white; border: none; padding: 15px; font-size: 18px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; font-family: 'Cairo', sans-serif;}
+        button#playBtn { background-color: var(--accent); color: white; border: none; padding: 15px; font-size: 18px; border-radius: 12px; cursor: pointer; width: 100%; font-weight: bold; font-family: 'Cairo', sans-serif;}
 
-        .main-display { width: 100%; max-width: 600px; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;}
-
-        #status { margin-top: 10px; font-weight: bold; color: var(--accent); font-size: 16px; min-height: 24px; text-align: center;}
-        
-        #ayahImage { 
-            width: 100%; max-height: 40vh; object-fit: contain; margin: 20px 0; 
-            border-radius: 15px; background: rgba(255, 255, 255, 0.95); padding: 10px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: none; box-sizing: border-box;
-        }
-
-        .playback-controls { display: none; width: 100%; }
-        .nav-buttons { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 15px;}
-        .nav-btn { background-color: rgba(255,255,255,0.1); color: var(--text-main); border: 1px solid var(--glass-border); padding: 12px; border-radius: 10px; cursor: pointer; font-size: 16px; flex: 1; font-family: 'Cairo', sans-serif;}
-        #pauseBtn { background-color: var(--danger); border: none; color: #fff; font-weight: bold;}
-
-        /* أزرار إضافية (مشاركة وتفسير) */
-        .extra-buttons { display: flex; gap: 10px; margin-bottom: 15px;}
-        .extra-btn { flex: 1; background-color: transparent; border: 1px solid var(--accent); color: var(--accent); padding: 10px; border-radius: 10px; font-family: 'Cairo'; cursor: pointer;}
-        #shareBtn { border-color: #3b82f6; color: #3b82f6;}
-        
-        .tafsir-box { display: none; margin-top: 15px; padding: 15px; background: rgba(0,0,0,0.3); border-right: 3px solid var(--accent); border-radius: 10px; text-align: right; font-size: 16px; line-height: 1.8; color: var(--text-muted); }
-        .tafsir-box strong { color: var(--accent); display: block; margin-bottom: 5px;}
-
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 900; display: none; backdrop-filter: blur(3px);}
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 900; display: none; backdrop-filter: blur(3px);}
         .overlay.active { display: block; }
         audio { display: none; }
+
+        /* Media Query للهواتف لضمان تناسق الأحجام */
+        @media (max-width: 480px) {
+            .nav-btn { padding: 12px; font-size: 16px; }
+            .extra-btn { font-size: 13px; padding: 10px; }
+            .mem-row input, .mem-row select { font-size: 14px; padding: 8px;}
+        }
     </style>
 </head>
 <body>
 
     <h1>المصحف الشامل</h1>
-    <div class="subtitle">صدقة جارية</div>
+    <div class="subtitle">تلاوة، تدبر، وحفظ - صدقة جارية</div>
     
-    <button id="resumeBtn">🔄 استكمال آخر تلاوة</button>
-    <button id="openMenuBtn">⚙️ خيارات التلاوة</button>
-    <div id="status">جاهز للاستماع...</div>
-
+    <div class="top-buttons">
+        <button class="main-btn" id="resumeBtn">🔄 استكمال آخر تلاوة</button>
+        <button class="main-btn" id="installAppBtn">📲 تثبيت التطبيق</button>
+        <button class="main-btn" id="openMenuBtn">⚙️ اختر التلاوة</button>
+    </div>
+    
     <div class="main-display">
+        <h2 id="currentTopicName"></h2>
+        <div id="status">جاهز للاستماع...</div>
+
         <img id="ayahImage" src="" alt="الآية الكريمة">
         
+        <div class="tafsir-box" id="tafsirContainer">
+            <strong>التفسير الميسر:</strong>
+            <div id="tafsirText">...</div>
+        </div>
+        
         <div class="playback-controls" id="playbackControls">
+            
+            <div class="memorization-bar" id="memBar">
+                <span class="mem-title">أدوات الحفظ (تكرار وسرعة):</span>
+                <div class="mem-row full-surah-only" id="fullSurahOptions">
+                    <input type="number" id="startAyahInput" value="1" min="1" placeholder="من آية">
+                    <input type="number" id="endAyahInput" placeholder="إلى آية" min="1">
+                </div>
+                <div class="mem-row">
+                    <input type="number" id="ayahRepeatInput" value="1" min="1" max="100" placeholder="تكرار الآية">
+                    <select id="playbackSpeed">
+                        <option value="0.75">سرعة 0.75x</option>
+                        <option value="1" selected>سرعة 1.00x</option>
+                        <option value="1.25">سرعة 1.25x</option>
+                        <option value="1.5">سرعة 1.50x</option>
+                    </select>
+                </div>
+                <button id="applyRepeatBtn">تطبيق التعديلات</button>
+            </div>
+
+            <select id="ayahSelect"></select>
+            
             <div class="nav-buttons">
-                <button class="nav-btn" id="nextBtn">⏭️</button>
+                <button class="nav-btn" id="nextBtn">⏭️ اللاحق</button>
                 <button class="nav-btn" id="pauseBtn">⏸️ إيقاف</button>
-                <button class="nav-btn" id="prevBtn">⏮️</button>
+                <button class="nav-btn" id="prevBtn">⏮️ السابق</button>
             </div>
             
             <div class="extra-buttons">
                 <button class="extra-btn" id="toggleTafsirBtn">📖 التفسير</button>
                 <button class="extra-btn" id="shareBtn">🔗 شارك الأجر</button>
-            </div>
-            
-            <div class="tafsir-box" id="tafsirContainer">
-                <strong>التفسير الميسر:</strong>
-                <div id="tafsirText">...</div>
+                <button class="extra-btn" id="loopToggleBtn">🔁 تكرار القائمة</button>
             </div>
         </div>
     </div>
@@ -148,7 +180,7 @@
 
     <div class="floating-panel" id="settingsPanel">
         <div class="panel-header">
-            <h2 style="margin:0; font-size: 18px; color: var(--accent);">إعدادات التلاوة</h2>
+            <h2 style="margin:0; font-size: 20px; color: var(--accent);">إعدادات التلاوة</h2>
             <button class="close-btn" id="closeMenuBtn">✖</button>
         </div>
 
@@ -164,31 +196,14 @@
 
             <label id="contentLabel">اختر الموضوع:</label>
             <select id="contentSelect"></select>
-
-            <div class="repeat-options" id="repeatOptions">
-                <label style="color: var(--accent); font-weight: bold; margin-bottom: 5px; display: block;">أدوات الحفظ (التكرار)</label>
-                <div class="repeat-grid">
-                    <div>
-                        <label>من آية:</label>
-                        <input type="number" id="startAyahInput" value="1" min="1">
-                    </div>
-                    <div>
-                        <label>إلى آية:</label>
-                        <input type="number" id="endAyahInput" placeholder="النهاية" min="1">
-                    </div>
-                </div>
-                <label>تكرار الآية الواحدة (مرات):</label>
-                <input type="number" id="ayahRepeatInput" value="1" min="1" max="100">
-            </div>
         </div>
 
-        <button id="playBtn">بدء الاستماع</button>
-        <select id="ayahSelect" style="display:none;"></select>
+        <button id="playBtn">تحميل وبدء الاستماع</button>
     </div>
 
     <audio id="audioA"></audio>
     <audio id="audioB"></audio>
 
-    <script src="script.js?v=12"></script> 
+    <script src="script.js?v=15"></script> 
 </body>
 </html>
