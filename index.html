@@ -47,10 +47,8 @@
         #installAppBtn { background-color: #8b5cf6; color: white; display: none; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* منطقة العرض الرئيسية */
         .main-display { width: 100%; max-width: 600px; flex-grow: 1; display: flex; flex-direction: column; align-items: center;}
 
-        /* اسم الموضوع فوق السورة */
         #currentTopicName { color: #fcd34d; font-size: 18px; margin: 0 0 5px 0; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         #status { font-weight: bold; color: var(--accent); font-size: 16px; min-height: 24px; margin-bottom: 15px;}
         
@@ -60,18 +58,22 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: none; box-sizing: border-box;
         }
 
-        /* التفسير تحت الآية مباشرة */
         .tafsir-box { display: none; width: 100%; margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-right: 4px solid var(--accent); border-radius: 10px; text-align: right; font-size: 15px; line-height: 1.8; color: var(--text-muted); box-sizing: border-box;}
         .tafsir-box strong { color: var(--accent); display: block; margin-bottom: 8px;}
 
         .playback-controls { display: none; width: 100%; }
         
-        /* شريط الحفظ والسرعة الخارجي */
+        /* شريط الحفظ وتنسيق الـ Labels الجديدة */
         .memorization-bar { background: rgba(30, 41, 59, 0.6); padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid var(--glass-border); width: 100%; box-sizing: border-box;}
-        .mem-title { color: var(--accent); font-size: 14px; font-weight: bold; margin-bottom: 12px; text-align: right; display: block;}
+        .mem-title { color: var(--accent); font-size: 14px; font-weight: bold; margin-bottom: 15px; text-align: right; display: block;}
         .mem-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;}
-        .mem-row input, .mem-row select { padding: 10px; font-size: 15px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.8); color: var(--text-main); font-family: 'Cairo'; flex: 1; min-width: 80px; text-align: center; outline: none;}
-        #applyRepeatBtn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; font-family: 'Cairo'; font-size: 16px; transition: 0.3s;}
+        
+        /* الجروب اللي بيضم العنوان والمربع */
+        .input-group { flex: 1; display: flex; flex-direction: column; text-align: right; min-width: 45%; }
+        .input-group label { color: var(--text-muted); font-size: 13px; margin-bottom: 5px; font-weight: bold; }
+        .input-group input, .input-group select { padding: 10px; font-size: 15px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.8); color: var(--text-main); font-family: 'Cairo'; outline: none; text-align: center;}
+        
+        #applyRepeatBtn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; font-family: 'Cairo'; font-size: 16px; transition: 0.3s; margin-top: 5px;}
         
         #ayahSelect { margin-bottom: 15px; background-color: rgba(30, 41, 59, 0.8); border: 1px solid var(--accent); font-weight: bold; width: 100%; padding: 12px; border-radius: 10px; color: var(--text-main); font-family: 'Cairo'; outline: none;}
         
@@ -87,7 +89,6 @@
         #loopToggleBtn { border-color: var(--danger); color: var(--danger); }
         #loopToggleBtn.active { background-color: var(--danger); color: white; }
         
-        /* اللوحة الطائرة للإعدادات */
         .floating-panel {
             position: fixed; bottom: -100%; left: 0; width: 100%;
             background: var(--panel-bg); backdrop-filter: blur(15px);
@@ -109,12 +110,14 @@
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 900; display: none; backdrop-filter: blur(3px);}
         .overlay.active { display: block; }
         audio { display: none; }
+        
+        .full-surah-only { display: none; }
 
-        /* Media Query للهواتف لضمان تناسق الأحجام */
         @media (max-width: 480px) {
             .nav-btn { padding: 12px; font-size: 16px; }
             .extra-btn { font-size: 13px; padding: 10px; }
-            .mem-row input, .mem-row select { font-size: 14px; padding: 8px;}
+            .input-group label { font-size: 12px; }
+            .input-group input, .input-group select { font-size: 14px; padding: 8px;}
         }
     </style>
 </head>
@@ -144,18 +147,32 @@
             
             <div class="memorization-bar" id="memBar">
                 <span class="mem-title">أدوات الحفظ (تكرار وسرعة):</span>
+                
                 <div class="mem-row full-surah-only" id="fullSurahOptions">
-                    <input type="number" id="startAyahInput" value="1" min="1" placeholder="من آية">
-                    <input type="number" id="endAyahInput" placeholder="إلى آية" min="1">
+                    <div class="input-group">
+                        <label for="startAyahInput">من آية:</label>
+                        <input type="number" id="startAyahInput" value="1" min="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="endAyahInput">إلى آية:</label>
+                        <input type="number" id="endAyahInput" min="1">
+                    </div>
                 </div>
+                
                 <div class="mem-row">
-                    <input type="number" id="ayahRepeatInput" value="1" min="1" max="100" placeholder="تكرار الآية">
-                    <select id="playbackSpeed">
-                        <option value="0.75">سرعة 0.75x</option>
-                        <option value="1" selected>سرعة 1.00x</option>
-                        <option value="1.25">سرعة 1.25x</option>
-                        <option value="1.5">سرعة 1.50x</option>
-                    </select>
+                    <div class="input-group">
+                        <label for="ayahRepeatInput">عدد التكرارات:</label>
+                        <input type="number" id="ayahRepeatInput" value="1" min="1" max="100">
+                    </div>
+                    <div class="input-group">
+                        <label for="playbackSpeed">سرعة التشغيل:</label>
+                        <select id="playbackSpeed">
+                            <option value="0.75">سرعة 0.75x</option>
+                            <option value="1" selected>سرعة 1.00x</option>
+                            <option value="1.25">سرعة 1.25x</option>
+                            <option value="1.5">سرعة 1.50x</option>
+                        </select>
+                    </div>
                 </div>
                 <button id="applyRepeatBtn">تطبيق التعديلات</button>
             </div>
@@ -204,6 +221,6 @@
     <audio id="audioA"></audio>
     <audio id="audioB"></audio>
 
-    <script src="script.js?v=15"></script> 
+    <script src="script.js?v=16"></script> 
 </body>
 </html>
