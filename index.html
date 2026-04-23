@@ -21,172 +21,222 @@
             --glass-border: rgba(255, 255, 255, 0.1);
         }
 
-        body { 
-            font-family: 'Cairo', sans-serif; text-align: center; margin: 0; padding: 15px; 
-            background-color: var(--bg-color); color: var(--text-main);
-            background-image: radial-gradient(var(--glass-border) 2px, transparent 2px);
-            background-size: 30px 30px; min-height: 100vh; display: flex; flex-direction: column; align-items: center;
+        /* قاعدة أساسية لمنع أي خروج عن الشاشة */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        h1 { color: var(--accent); margin-bottom: 5px; font-size: 26px;}
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            text-align: center; 
+            background-color: var(--bg-color); 
+            color: var(--text-main);
+            background-image: radial-gradient(var(--glass-border) 2px, transparent 2px);
+            background-size: 30px 30px; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center;
+            overflow-x: hidden; /* يمنع السكرول العرضي تماماً */
+        }
+
+        /* حاوية التطبيق الأساسية */
+        .app-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1;
+        }
+
+        h1 { color: var(--accent); margin-bottom: 5px; font-size: 24px;}
         .subtitle { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
         
-        .top-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; width: 100%; max-width: 600px;}
+        /* أزرار القائمة العلوية */
+        .top-buttons { 
+            display: flex; 
+            flex-direction: column; /* فوق بعض في الموبايل */
+            gap: 10px; 
+            width: 100%; 
+            margin-bottom: 20px;
+        }
+        
         .main-btn {
-            background: var(--panel-bg); color: var(--text-main); border: 1px solid var(--glass-border); padding: 12px 15px;
+            background: var(--panel-bg); color: var(--text-main);
+            border: 1px solid var(--glass-border); padding: 15px;
             border-radius: 15px; cursor: pointer; backdrop-filter: blur(10px);
-            font-family: 'Cairo', sans-serif; font-weight: bold; transition: 0.3s; font-size: 15px; flex: 1; min-width: 140px;
+            font-family: 'Cairo', sans-serif; font-weight: bold; font-size: 16px; 
+            width: 100%; transition: 0.3s;
         }
         .main-btn:hover { border-color: var(--accent); }
         
         #resumeBtn { background-color: #3b82f6; color: white; display: none; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4); animation: pulse 2s infinite;}
         #installAppBtn { background-color: #8b5cf6; color: white; display: none; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
 
-        .main-display { width: 100%; max-width: 600px; flex-grow: 1; display: flex; flex-direction: column; align-items: center;}
-        #currentTopicName { color: #fcd34d; font-size: 18px; margin: 0 0 5px 0; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        /* منطقة العرض */
+        .main-display { width: 100%; display: flex; flex-direction: column; align-items: center;}
+        #currentTopicName { color: #fcd34d; font-size: 18px; margin-bottom: 5px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         #status { font-weight: bold; color: var(--accent); font-size: 16px; min-height: 24px; margin-bottom: 15px;}
         
         #ayahImage { 
-            width: 100%; max-height: 35vh; object-fit: contain; margin-bottom: 15px; 
-            border-radius: 15px; background: rgba(255, 255, 255, 0.95); padding: 10px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3); display: none; box-sizing: border-box;
+            width: 100%; 
+            max-height: 40vh; 
+            object-fit: contain; 
+            margin-bottom: 15px; 
+            border-radius: 15px; 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 10px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3); 
+            display: none; 
         }
 
-        .tafsir-box { display: none; width: 100%; margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-right: 4px solid var(--accent); border-radius: 10px; text-align: right; font-size: 15px; line-height: 1.8; color: var(--text-muted); box-sizing: border-box;}
+        .tafsir-box { display: none; width: 100%; margin-bottom: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-right: 4px solid var(--accent); border-radius: 10px; text-align: right; font-size: 15px; line-height: 1.8; color: var(--text-muted);}
         .tafsir-box strong { color: var(--accent); display: block; margin-bottom: 8px;}
+
         .playback-controls { display: none; width: 100%; }
         
-        /* --------------------------------------------------- */
-        /* تصميم لوحة الحفظ المنسدلة (Pull-down panel) الجديدة */
-        /* --------------------------------------------------- */
+        /* أدوات الحفظ (اللوحة المنسدلة) */
         .memorization-container {
             width: 100%; margin-bottom: 20px; border-radius: 15px; border: 1px solid var(--glass-border);
-            background: rgba(30, 41, 59, 0.6); overflow: hidden; box-sizing: border-box;
+            background: rgba(30, 41, 59, 0.6); overflow: hidden;
         }
         .mem-header {
             padding: 15px; font-size: 15px; font-weight: bold; color: var(--accent); background: rgba(0,0,0,0.2);
-            cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: 0.3s;
+            cursor: pointer; display: flex; justify-content: space-between; align-items: center;
         }
-        .mem-header:hover { background: rgba(0,0,0,0.4); }
         .mem-icon { transition: transform 0.3s; }
         .mem-body { padding: 15px; display: none; }
-        .mem-body.active { display: block; animation: dropDown 0.3s ease-out; }
-        @keyframes dropDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .mem-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;}
-        .input-group { flex: 1; display: flex; flex-direction: column; text-align: right; min-width: 45%; }
+        .mem-body.active { display: block; }
+        
+        .mem-row { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+        .input-group { width: 100%; display: flex; flex-direction: column; text-align: right; }
         .input-group label { color: var(--text-muted); font-size: 13px; margin-bottom: 5px; font-weight: bold; }
-        .input-group input, .input-group select { padding: 10px; font-size: 15px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.8); color: var(--text-main); font-family: 'Cairo'; outline: none; text-align: center;}
-        #applyRepeatBtn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; font-family: 'Cairo'; font-size: 16px; transition: 0.3s; margin-top: 5px;}
+        .input-group input, .input-group select { width: 100%; padding: 12px; font-size: 15px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.8); color: var(--text-main); font-family: 'Cairo'; outline: none; text-align: center; appearance: none;}
+        #applyRepeatBtn { background: var(--accent); color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; width: 100%; font-weight: bold; font-family: 'Cairo'; font-size: 16px; margin-top: 5px;}
         .full-surah-only { display: none; }
 
-        /* بقية العناصر */
+        /* التحكم في التلاوة */
         #ayahSelect { margin-bottom: 15px; background-color: rgba(30, 41, 59, 0.8); border: 1px solid var(--accent); font-weight: bold; width: 100%; padding: 12px; border-radius: 10px; color: var(--text-main); font-family: 'Cairo'; outline: none;}
-        .nav-buttons { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 20px; width: 100%;}
-        .nav-btn { background-color: rgba(255,255,255,0.1); color: var(--text-main); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; cursor: pointer; font-size: 18px; flex: 1; font-family: 'Cairo', sans-serif;}
-        #pauseBtn { background-color: var(--danger); border: none; color: #fff; font-weight: bold; flex: 1.5;}
+        
+        .nav-buttons { display: flex; gap: 10px; margin-bottom: 20px; width: 100%;}
+        .nav-btn { background-color: rgba(255,255,255,0.1); color: var(--text-main); border: 1px solid var(--glass-border); padding: 15px 5px; border-radius: 12px; cursor: pointer; font-size: 16px; flex: 1; font-family: 'Cairo', sans-serif;}
+        #pauseBtn { background-color: var(--danger); border: none; font-weight: bold; flex: 1.5;}
 
-        .extra-buttons { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; width: 100%;}
-        .extra-btn { flex: 1; background-color: transparent; border: 1px solid var(--glass-border); color: var(--text-main); padding: 12px; border-radius: 12px; font-family: 'Cairo'; font-size: 14px; cursor: pointer; min-width: 30%; font-weight: bold; transition: 0.3s;}
-        .extra-btn:hover { background-color: rgba(255,255,255,0.1); }
+        /* أزرار إضافية بنظام الشبكة (Grid) للموبايل */
+        .extra-buttons { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; /* عمودين للموبايل */
+            gap: 10px; 
+            margin-bottom: 15px; 
+            width: 100%;
+        }
+        .extra-btn { background-color: transparent; border: 1px solid var(--glass-border); color: var(--text-main); padding: 12px; border-radius: 12px; font-family: 'Cairo'; font-size: 14px; cursor: pointer; font-weight: bold; width: 100%;}
+        #loopToggleBtn { grid-column: span 2; border-color: var(--danger); color: var(--danger); } /* زرار التكرار بياخد العرض كله من تحت */
+        #loopToggleBtn.active { background-color: var(--danger); color: white; }
         #toggleTafsirBtn { border-color: var(--accent); color: var(--accent); }
         #shareBtn { border-color: #3b82f6; color: #3b82f6;}
-        #loopToggleBtn { border-color: var(--danger); color: var(--danger); }
-        #loopToggleBtn.active { background-color: var(--danger); color: white; }
         
-        .floating-panel { position: fixed; bottom: -100%; left: 0; width: 100%; background: var(--panel-bg); backdrop-filter: blur(15px); border-top: 1px solid var(--glass-border); border-radius: 25px 25px 0 0; padding: 25px 20px; box-sizing: border-box; transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; max-height: 85vh; overflow-y: auto; }
+        /* اللوحة الطائرة للإعدادات */
+        .floating-panel { position: fixed; bottom: -100%; left: 0; width: 100%; background: var(--panel-bg); backdrop-filter: blur(15px); border-top: 1px solid var(--glass-border); border-radius: 25px 25px 0 0; padding: 25px 20px; transition: bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; max-height: 90vh; overflow-y: auto; }
         .floating-panel.active { bottom: 0; }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .close-btn { background: none; border: none; color: var(--text-main); font-size: 28px; cursor: pointer; }
         .selectors { display: flex; flex-direction: column; gap: 15px; text-align: right; margin-bottom: 20px;}
-        .selectors label { color: var(--text-muted); font-size: 15px; }
-        .selectors select { padding: 12px; font-size: 16px; border-radius: 12px; border: 1px solid var(--glass-border); width: 100%; outline: none; background-color: rgba(15, 23, 42, 0.9); color: var(--text-main); font-family: 'Cairo', sans-serif; box-sizing: border-box;}
+        .selectors label { color: var(--text-muted); font-size: 15px; font-weight: bold;}
+        .selectors select { padding: 15px; font-size: 16px; border-radius: 12px; border: 1px solid var(--glass-border); width: 100%; outline: none; background-color: rgba(15, 23, 42, 0.9); color: var(--text-main); font-family: 'Cairo', sans-serif;}
         button#playBtn { background-color: var(--accent); color: white; border: none; padding: 15px; font-size: 18px; border-radius: 12px; cursor: pointer; width: 100%; font-weight: bold; font-family: 'Cairo', sans-serif;}
 
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 900; display: none; backdrop-filter: blur(3px);}
         .overlay.active { display: block; }
         audio { display: none; }
 
-        @media (max-width: 480px) {
-            .nav-btn { padding: 12px; font-size: 16px; }
-            .extra-btn { font-size: 13px; padding: 10px; }
-            .input-group label { font-size: 12px; }
-            .input-group input, .input-group select { font-size: 14px; padding: 8px;}
+        /* تعديلات شاشات الكمبيوتر والتابلت (Desktop/Tablet) */
+        @media (min-width: 481px) {
+            .top-buttons { flex-direction: row; }
+            .mem-row { flex-direction: row; }
+            .extra-buttons { grid-template-columns: 1fr 1fr 1fr; }
+            #loopToggleBtn { grid-column: auto; } /* يرجع لعمود واحد في الكمبيوتر */
         }
     </style>
 </head>
 <body>
 
-    <h1>المصحف الشامل</h1>
-    <div class="subtitle">تلاوة، تدبر، وحفظ - صدقة جارية</div>
-    
-    <div class="top-buttons">
-        <button class="main-btn" id="resumeBtn">🔄 استكمال آخر تلاوة</button>
-        <button class="main-btn" id="installAppBtn">📲 تثبيت التطبيق</button>
-        <button class="main-btn" id="openMenuBtn">⚙️ اختر التلاوة</button>
-    </div>
-    
-    <div class="main-display">
-        <h2 id="currentTopicName"></h2>
-        <div id="status">جاهز للاستماع...</div>
-
-        <img id="ayahImage" src="" alt="الآية الكريمة">
+    <div class="app-container">
+        <h1>المصحف الشامل</h1>
+        <div class="subtitle">تلاوة، تدبر، وحفظ - صدقة جارية</div>
         
-        <div class="tafsir-box" id="tafsirContainer">
-            <strong>التفسير الميسر:</strong>
-            <div id="tafsirText">...</div>
+        <div class="top-buttons">
+            <button class="main-btn" id="resumeBtn">🔄 استكمال آخر تلاوة</button>
+            <button class="main-btn" id="installAppBtn">📲 تثبيت التطبيق</button>
+            <button class="main-btn" id="openMenuBtn">⚙️ اختر التلاوة</button>
         </div>
         
-        <div class="playback-controls" id="playbackControls">
-            
-            <div class="memorization-container">
-                <div class="mem-header" id="toggleMemBtn">
-                    <span>⚙️ أدوات الحفظ (تكرار وسرعة)</span>
-                    <span class="mem-icon" id="memIcon">▼</span>
-                </div>
-                <div class="mem-body" id="memBody">
-                    <div class="mem-row full-surah-only" id="fullSurahOptions">
-                        <div class="input-group">
-                            <label for="startAyahInput">من آية:</label>
-                            <input type="number" id="startAyahInput" value="1" min="1">
-                        </div>
-                        <div class="input-group">
-                            <label for="endAyahInput">إلى آية:</label>
-                            <input type="number" id="endAyahInput" min="1">
-                        </div>
-                    </div>
-                    <div class="mem-row">
-                        <div class="input-group">
-                            <label for="ayahRepeatInput">عدد التكرارات:</label>
-                            <input type="number" id="ayahRepeatInput" value="1" min="1" max="100">
-                        </div>
-                        <div class="input-group">
-                            <label for="playbackSpeed">سرعة التشغيل:</label>
-                            <select id="playbackSpeed">
-                                <option value="0.75">سرعة 0.75x</option>
-                                <option value="1" selected>سرعة 1.00x</option>
-                                <option value="1.25">سرعة 1.25x</option>
-                                <option value="1.5">سرعة 1.50x</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button id="applyRepeatBtn">تطبيق التعديلات</button>
-                </div>
-            </div>
+        <div class="main-display">
+            <h2 id="currentTopicName"></h2>
+            <div id="status">جاهز للاستماع...</div>
 
-            <select id="ayahSelect"></select>
+            <img id="ayahImage" src="" alt="الآية الكريمة">
             
-            <div class="nav-buttons">
-                <button class="nav-btn" id="nextBtn">⏭️ اللاحق</button>
-                <button class="nav-btn" id="pauseBtn">⏸️ إيقاف</button>
-                <button class="nav-btn" id="prevBtn">⏮️ السابق</button>
+            <div class="tafsir-box" id="tafsirContainer">
+                <strong>التفسير الميسر:</strong>
+                <div id="tafsirText">...</div>
             </div>
             
-            <div class="extra-buttons">
-                <button class="extra-btn" id="toggleTafsirBtn">📖 التفسير</button>
-                <button class="extra-btn" id="shareBtn">🔗 شارك الأجر</button>
-                <button class="extra-btn" id="loopToggleBtn">🔁 تكرار القائمة</button>
+            <div class="playback-controls" id="playbackControls">
+                
+                <div class="memorization-container">
+                    <div class="mem-header" id="toggleMemBtn">
+                        <span>⚙️ أدوات الحفظ (تكرار وسرعة)</span>
+                        <span class="mem-icon" id="memIcon">▼</span>
+                    </div>
+                    <div class="mem-body" id="memBody">
+                        <div class="mem-row full-surah-only" id="fullSurahOptions">
+                            <div class="input-group">
+                                <label for="startAyahInput">من آية:</label>
+                                <input type="number" id="startAyahInput" value="1" min="1">
+                            </div>
+                            <div class="input-group">
+                                <label for="endAyahInput">إلى آية:</label>
+                                <input type="number" id="endAyahInput" min="1">
+                            </div>
+                        </div>
+                        <div class="mem-row">
+                            <div class="input-group">
+                                <label for="ayahRepeatInput">عدد التكرارات:</label>
+                                <input type="number" id="ayahRepeatInput" value="1" min="1" max="100">
+                            </div>
+                            <div class="input-group">
+                                <label for="playbackSpeed">سرعة التشغيل:</label>
+                                <select id="playbackSpeed">
+                                    <option value="0.75">سرعة 0.75x</option>
+                                    <option value="1" selected>سرعة 1.00x</option>
+                                    <option value="1.25">سرعة 1.25x</option>
+                                    <option value="1.5">سرعة 1.50x</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button id="applyRepeatBtn">تطبيق التعديلات</button>
+                    </div>
+                </div>
+
+                <select id="ayahSelect"></select>
+                
+                <div class="nav-buttons">
+                    <button class="nav-btn" id="nextBtn">⏭️ اللاحق</button>
+                    <button class="nav-btn" id="pauseBtn">⏸️ إيقاف</button>
+                    <button class="nav-btn" id="prevBtn">⏮️ السابق</button>
+                </div>
+                
+                <div class="extra-buttons">
+                    <button class="extra-btn" id="toggleTafsirBtn">📖 التفسير</button>
+                    <button class="extra-btn" id="shareBtn">🔗 شارك الأجر</button>
+                    <button class="extra-btn" id="loopToggleBtn">🔁 تكرار القائمة</button>
+                </div>
             </div>
         </div>
     </div>
@@ -217,6 +267,6 @@
     <audio id="audioA"></audio>
     <audio id="audioB"></audio>
 
-    <script src="script.js?v=18"></script> 
+    <script src="script.js?v=19"></script> 
 </body>
 </html>
