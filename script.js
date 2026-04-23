@@ -1,3 +1,10 @@
+// --- تسجيل الـ Service Worker للـ PWA ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW Registration failed', err));
+    });
+}
+
 let playlist = [];
 let currentIndex = 0;
 let quranData = {}; 
@@ -5,11 +12,12 @@ let quranData = {};
 const surahNames = ["الفاتحة", "البقرة", "آل عمران", "النساء", "المائدة", "الأنعام", "الأعراف", "الأنفال", "التوبة", "يونس", "هود", "يوسف", "الرعد", "إبراهيم", "الحجر", "النحل", "الإسراء", "الكهف", "مريم", "طه", "الأنبياء", "الحج", "المؤمنون", "النور", "الفرقان", "الشعراء", "النمل", "القصص", "العنكبوت", "الروم", "لقمان", "السجدة", "الأحزاب", "سبأ", "فاطر", "يس", "الصافات", "ص", "الزمر", "غافر", "فصلت", "الشورى", "الزخرف", "الدخان", "الجاثية", "الأحقاف", "محمد", "الفتح", "الحجرات", "ق", "الذاريات", "الطور", "النجم", "القمر", "الرحمن", "الواقعة", "الحديد", "المجادلة", "الحشر", "الممتحنة", "الصف", "الجمعة", "المنافقون", "التغابن", "الطلاق", "التحريم", "الملك", "القلم", "الحاقة", "المعارج", "نوح", "الجن", "المزمل", "المدثر", "القيامة", "الإنسان", "المرسلات", "النبأ", "النازعات", "عبس", "التكوير", "الانفطار", "المطففين", "الانشقاق", "البروج", "الطارق", "الأعلى", "الغاشية", "الفجر", "البلد", "الشمس", "الليل", "الضحى", "الشرح", "التين", "العلق", "القدر", "البينة", "الزلزلة", "العاديات", "القارعة", "التكاثر", "العصر", "الهمزة", "الفيل", "قريش", "الماعون", "الكوثر", "الكافرون", "النصر", "المسد", "الإخلاص", "الفلق", "الناس"];
 const surahCounts = [7, 286, 200, 176, 120, 165, 206, 75, 129, 109, 123, 111, 43, 52, 99, 128, 111, 110, 98, 135, 112, 78, 118, 64, 77, 227, 93, 88, 69, 60, 34, 30, 73, 54, 45, 83, 182, 88, 75, 85, 54, 53, 89, 59, 37, 35, 38, 29, 18, 45, 60, 49, 62, 55, 78, 96, 29, 22, 24, 13, 14, 11, 11, 18, 12, 12, 30, 52, 52, 44, 28, 28, 20, 56, 40, 31, 50, 40, 46, 42, 29, 19, 36, 25, 22, 17, 19, 26, 30, 20, 15, 21, 11, 8, 8, 19, 5, 8, 8, 11, 11, 8, 3, 9, 5, 4, 7, 3, 6, 3, 5, 4, 5, 6];
 
-// عناصر الواجهة الطائرة
 const openMenuBtn = document.getElementById('openMenuBtn');
 const closeMenuBtn = document.getElementById('closeMenuBtn');
 const settingsPanel = document.getElementById('settingsPanel');
 const overlay = document.getElementById('overlay');
+const resumeBtn = document.getElementById('resumeBtn');
+const shareBtn = document.getElementById('shareBtn');
 
 function toggleMenu() {
     settingsPanel.classList.toggle('active');
@@ -29,6 +37,7 @@ const statusDiv = document.getElementById('status');
 const playBtn = document.getElementById('playBtn');
 const ayahImage = document.getElementById('ayahImage');
 const playbackControls = document.getElementById('playbackControls');
+const ayahSelect = document.getElementById('ayahSelect');
 const pauseBtn = document.getElementById('pauseBtn'); 
 
 const toggleTafsirBtn = document.getElementById('toggleTafsirBtn');
@@ -46,6 +55,20 @@ toggleTafsirBtn.onclick = () => {
     tafsirContainer.style.display = isTafsirVisible ? "block" : "none";
 };
 
+// --- نظام مشاركة الأجر ---
+shareBtn.onclick = () => {
+    const currentAyahText = statusDiv.innerText;
+    const shareText = `أستمع الآن إلى ${currentAyahText} على تطبيق المصحف الشامل. شارك في الأجر واستمع معي: ${window.location.href}`;
+    
+    if (navigator.share) {
+        navigator.share({ title: 'المصحف الشامل', text: shareText, url: window.location.href })
+            .catch(console.error);
+    } else {
+        navigator.clipboard.writeText(shareText);
+        alert("تم نسخ الرابط! يمكنك لصقه ومشاركته مع أصدقائك والدال على الخير كفاعله.");
+    }
+};
+
 fetch('data.json?v=' + new Date().getTime())
     .then(r => r.json())
     .then(data => {
@@ -54,23 +77,38 @@ fetch('data.json?v=' + new Date().getTime())
             reciterSelect.add(new Option(r.name, r.folder));
         });
         updateContentDropdown();
+        
+        // --- نظام استعادة الجلسة (Bookmarks) ---
+        const savedSession = JSON.parse(localStorage.getItem('quran_saved_session'));
+        if (savedSession) {
+            resumeBtn.style.display = "inline-block";
+            resumeBtn.onclick = () => {
+                reciterSelect.value = savedSession.reciter;
+                typeSelect.value = savedSession.type;
+                updateContentDropdown();
+                setTimeout(() => {
+                    contentSelect.value = savedSession.content;
+                    buildPlaylistAndPlay(savedSession.index);
+                    resumeBtn.style.display = "none";
+                }, 100);
+            };
+        }
     });
 
 function updateContentDropdown() {
     contentSelect.innerHTML = "";
     if (typeSelect.value === 'subjective') {
         contentLabel.innerText = "اختر الموضوع:";
-        repeatOptions.style.display = "none"; // إخفاء التكرار في الموضوعي
+        repeatOptions.style.display = "none";
         quranData.topics.forEach(t => {
             contentSelect.add(new Option(t.title, t.id));
         });
     } else {
         contentLabel.innerText = "اختر السورة:";
-        repeatOptions.style.display = "block"; // إظهار التكرار في المصحف
+        repeatOptions.style.display = "block";
         surahNames.forEach((name, index) => {
             contentSelect.add(new Option(`${index + 1}. سورة ${name}`, index + 1));
         });
-        // تحديث الحد الأقصى للآيات عند تغيير السورة
         updateAyahLimits();
     }
 }
@@ -87,9 +125,10 @@ function updateAyahLimits() {
 typeSelect.addEventListener('change', updateContentDropdown);
 contentSelect.addEventListener('change', updateAyahLimits);
 
-function buildPlaylistAndPlay() {
+function buildPlaylistAndPlay(startIndex = 0) {
     playlist = [];
-    currentIndex = 0;
+    currentIndex = startIndex; // تشغيل من النقطة المحفوظة لو موجودة
+    ayahSelect.innerHTML = "";
     let lastSurahId = -1;
 
     if (typeSelect.value === 'subjective') {
@@ -109,22 +148,18 @@ function buildPlaylistAndPlay() {
         const surahName = surahNames[surahId - 1];
         const totalAyahs = surahCounts[surahId - 1];
         
-        // جلب إعدادات التكرار
         let startA = parseInt(document.getElementById('startAyahInput').value) || 1;
         let endA = parseInt(document.getElementById('endAyahInput').value) || totalAyahs;
         let repeatCount = parseInt(document.getElementById('ayahRepeatInput').value) || 1;
 
-        // حماية من الأرقام الغلط
         if(startA < 1) startA = 1;
         if(endA > totalAyahs) endA = totalAyahs;
         if(startA > endA) startA = endA;
 
-        // إضافة البسملة إذا بدأ من الآية 1 (وليست التوبة)
         if (surahId !== 9 && startA === 1) {
             playlist.push({ isBasmala: true });
         }
 
-        // بناء قائمة التشغيل بالتكرار
         for(let i = startA; i <= endA; i++) {
             for(let r = 0; r < repeatCount; r++) {
                 let rText = repeatCount > 1 ? ` (تكرار ${r+1})` : '';
@@ -133,9 +168,10 @@ function buildPlaylistAndPlay() {
         }
     }
     
-    toggleMenu(); // قفل اللوحة بعد الضغط
+    toggleMenu(); 
     playbackControls.style.display = "block";
-    playAyah(0);
+    resumeBtn.style.display = "none";
+    playAyah(currentIndex);
 }
 
 function getAudioUrl(index) {
@@ -163,7 +199,7 @@ function playAyah(index) {
         if (contentSelect.selectedIndex < contentSelect.options.length - 1 && typeSelect.value === 'subjective') {
             contentSelect.selectedIndex += 1; 
             statusDiv.innerText = "انتهى المقطع.. جاري الانتقال للتالي تلقائياً...";
-            setTimeout(() => buildPlaylistAndPlay(), 1500);
+            setTimeout(() => buildPlaylistAndPlay(0), 1500);
         } else {
             statusDiv.innerText = "انتهت التلاوة.";
             ayahImage.style.display = "none";
@@ -174,6 +210,14 @@ function playAyah(index) {
     
     if(checkTimeInterval) clearInterval(checkTimeInterval);
     currentIndex = index;
+    
+    // --- حفظ الجلسة محلياً ---
+    localStorage.setItem('quran_saved_session', JSON.stringify({
+        reciter: reciterSelect.value,
+        type: typeSelect.value,
+        content: contentSelect.value,
+        index: currentIndex
+    }));
     
     isPaused = false;
     pauseBtn.innerText = "⏸️ إيقاف";
@@ -239,4 +283,4 @@ document.getElementById('prevBtn').onclick = () => {
     playAyah(currentIndex - 1);
 };
 
-playBtn.onclick = buildPlaylistAndPlay;
+playBtn.onclick = () => buildPlaylistAndPlay(0); // عند الضغط يبدأ من الأول
