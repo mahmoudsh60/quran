@@ -129,10 +129,21 @@ function fetchTafsir(surah, ayah) {
 }
 
 function playAyah(index) {
+    // التحديث: الانتقال التلقائي للسورة أو الموضوع التالي عند الانتهاء
     if (index >= playlist.length) {
-        statusDiv.innerText = "انتهت التلاوة.";
-        ayahImage.style.display = "none";
-        tafsirContainer.style.display = "none";
+        if (contentSelect.selectedIndex < contentSelect.options.length - 1) {
+            contentSelect.selectedIndex += 1; 
+            statusDiv.innerText = "انتهى المقطع.. جاري الانتقال للتالي تلقائياً...";
+            
+            setTimeout(() => {
+                buildPlaylistAndPlay();
+            }, 1500);
+        } else {
+            statusDiv.innerText = "انتهت جميع التلاوات في القائمة.";
+            ayahImage.style.display = "none";
+            tafsirContainer.style.display = "none";
+            pauseBtn.style.display = "none"; 
+        }
         return;
     }
     
@@ -144,6 +155,7 @@ function playAyah(index) {
     isPaused = false;
     pauseBtn.innerText = "إيقاف ⏸️";
     pauseBtn.style.backgroundColor = "#e67e22";
+    pauseBtn.style.display = "inline-block";
     
     const nextPlayerIndex = (currentPlayerIndex + 1) % 2;
     const activePlayer = audioPlayers[currentPlayerIndex];
